@@ -9,7 +9,7 @@ pipeline {
 
             steps{
                 script {
-                    sh "ci/jenkins/docker-build.sh"
+                    sh "ci/docker-build.sh"
                 }
             }
         }
