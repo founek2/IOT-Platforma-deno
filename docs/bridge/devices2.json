@@ -1,0 +1,400 @@
+[
+    {
+        "definition": null,
+        "disabled": false,
+        "endpoints": {
+            "1": {
+                "bindings": [],
+                "clusters": {
+                    "input": [
+                        "genBasic",
+                        "genIdentify",
+                        "genOnOff",
+                        "genTime",
+                        "genOta",
+                        "26",
+                        "lightingColorCtrl"
+                    ],
+                    "output": [
+                        "genBasic",
+                        "genIdentify",
+                        "genGroups",
+                        "genScenes",
+                        "genOnOff",
+                        "genLevelCtrl",
+                        "genPollCtrl",
+                        "lightingColorCtrl",
+                        "msIlluminanceMeasurement",
+                        "msTemperatureMeasurement",
+                        "msRelativeHumidity",
+                        "msOccupancySensing",
+                        "ssIasZone",
+                        "haMeterIdentification",
+                        "haApplianceStatistics",
+                        "haElectricalMeasurement",
+                        "seMetering",
+                        "touchlink",
+                        "manuSpecificUbisysDimmerSetup",
+                        "manuSpecificSamsungAccelerometer"
+                    ]
+                },
+                "configured_reportings": [],
+                "scenes": []
+            },
+            "242": {
+                "bindings": [],
+                "clusters": {
+                    "input": [],
+                    "output": [
+                        "greenPower"
+                    ]
+                },
+                "configured_reportings": [],
+                "scenes": []
+            }
+        },
+        "friendly_name": "Coordinator",
+        "ieee_address": "0xe0798dfffe7f47b2",
+        "interview_completed": true,
+        "interviewing": false,
+        "network_address": 0,
+        "supported": false,
+        "type": "Coordinator"
+    },
+    {
+        "date_code": "20201026",
+        "definition": {
+            "description": "Zigbee smart switch",
+            "exposes": [
+                {
+                    "features": [
+                        {
+                            "access": 7,
+                            "description": "On/off state of the switch",
+                            "name": "state",
+                            "property": "state",
+                            "type": "binary",
+                            "value_off": "OFF",
+                            "value_on": "ON",
+                            "value_toggle": "TOGGLE"
+                        }
+                    ],
+                    "type": "switch"
+                },
+                {
+                    "access": 1,
+                    "description": "Link quality (signal strength)",
+                    "name": "linkquality",
+                    "property": "linkquality",
+                    "type": "numeric",
+                    "unit": "lqi",
+                    "value_max": 255,
+                    "value_min": 0
+                }
+            ],
+            "model": "BASICZBR3",
+            "options": [
+                {
+                    "access": 2,
+                    "description": "State actions will also be published as 'action' when true (default false).",
+                    "name": "state_action",
+                    "property": "state_action",
+                    "type": "binary",
+                    "value_off": false,
+                    "value_on": true
+                }
+            ],
+            "supports_ota": false,
+            "vendor": "SONOFF"
+        },
+        "disabled": false,
+        "endpoints": {
+            "1": {
+                "bindings": [],
+                "clusters": {
+                    "input": [
+                        "genBasic",
+                        "genIdentify",
+                        "genGroups",
+                        "genScenes",
+                        "genOnOff"
+                    ],
+                    "output": [
+                        "genBasic"
+                    ]
+                },
+                "configured_reportings": [],
+                "scenes": []
+            }
+        },
+        "friendly_name": "switch-1",
+        "ieee_address": "0x00124b00226c9a95",
+        "interview_completed": true,
+        "interviewing": false,
+        "manufacturer": "SONOFF",
+        "model_id": "BASICZBR3",
+        "network_address": 37720,
+        "power_source": "Mains (single phase)",
+        "software_build_id": "1.0.3",
+        "supported": true,
+        "type": "Router"
+    },
+    {
+        "date_code": "",
+        "definition": {
+            "description": "Water irrigation valve",
+            "exposes": [
+                {
+                    "access": 1,
+                    "description": "Remaining battery in %, can take up to 24 hours before reported.",
+                    "name": "battery",
+                    "property": "battery",
+                    "type": "numeric",
+                    "unit": "%",
+                    "value_max": 100,
+                    "value_min": 0
+                },
+                {
+                    "access": 3,
+                    "description": "State",
+                    "name": "state",
+                    "property": "state",
+                    "type": "binary",
+                    "value_off": "OFF",
+                    "value_on": "ON"
+                },
+                {
+                    "access": 3,
+                    "description": "Irrigation mode",
+                    "name": "mode",
+                    "property": "mode",
+                    "type": "enum",
+                    "values": [
+                        "duration",
+                        "capacity"
+                    ]
+                },
+                {
+                    "access": 3,
+                    "description": "Number of cycle irrigation times, set to 0 for single cycle",
+                    "name": "cycle_irrigation_num_times",
+                    "property": "cycle_irrigation_num_times",
+                    "type": "numeric",
+                    "value_max": 100,
+                    "value_min": 0
+                },
+                {
+                    "access": 1,
+                    "description": "Last irrigation start time",
+                    "name": "irrigation_start_time",
+                    "property": "irrigation_start_time",
+                    "type": "numeric"
+                },
+                {
+                    "access": 1,
+                    "description": "Last irrigation end time",
+                    "name": "irrigation_end_time",
+                    "property": "irrigation_end_time",
+                    "type": "numeric"
+                },
+                {
+                    "access": 1,
+                    "description": "Last irrigation duration",
+                    "name": "last_irrigation_duration",
+                    "property": "last_irrigation_duration",
+                    "type": "numeric"
+                },
+                {
+                    "access": 1,
+                    "description": "Last irrigation water consumption",
+                    "name": "water_consumed",
+                    "property": "water_consumed",
+                    "type": "numeric",
+                    "unit": "L"
+                },
+                {
+                    "access": 3,
+                    "description": "Irrigation target, duration in seconds or capacity in litres (depending on mode), set to 0 to leave the valve on indefinitely, for safety reasons the target will be forced to a minimum of 10 seconds in duration mode",
+                    "name": "irrigation_target",
+                    "property": "irrigation_target",
+                    "type": "numeric",
+                    "unit": "seconds or litres",
+                    "value_max": 43200,
+                    "value_min": 0
+                },
+                {
+                    "access": 3,
+                    "description": "Cycle irrigation interval",
+                    "name": "cycle_irrigation_interval",
+                    "property": "cycle_irrigation_interval",
+                    "type": "numeric",
+                    "unit": "sec",
+                    "value_max": 43200,
+                    "value_min": 0
+                },
+                {
+                    "access": 1,
+                    "description": "Link quality (signal strength)",
+                    "name": "linkquality",
+                    "property": "linkquality",
+                    "type": "numeric",
+                    "unit": "lqi",
+                    "value_max": 255,
+                    "value_min": 0
+                }
+            ],
+            "model": "QT06_2",
+            "options": [],
+            "supports_ota": false,
+            "vendor": "GiEX"
+        },
+        "disabled": false,
+        "endpoints": {
+            "1": {
+                "bindings": [],
+                "clusters": {
+                    "input": [
+                        "genGroups",
+                        "genScenes",
+                        "manuSpecificTuya",
+                        "genBasic"
+                    ],
+                    "output": [
+                        "genOta",
+                        "genTime"
+                    ]
+                },
+                "configured_reportings": [],
+                "scenes": []
+            }
+        },
+        "friendly_name": "Ventil",
+        "ieee_address": "0xa4c1388b29b9ebc1",
+        "interview_completed": true,
+        "interviewing": false,
+        "manufacturer": "_TZE200_a7sghmms",
+        "model_id": "TS0601",
+        "network_address": 55416,
+        "power_source": "Battery",
+        "supported": true,
+        "type": "EndDevice"
+    },
+    {
+        "date_code": "",
+        "definition": {
+            "description": "Soil sensor",
+            "exposes": [
+                {
+                    "access": 1,
+                    "description": "Measured temperature value",
+                    "name": "temperature",
+                    "property": "temperature",
+                    "type": "numeric",
+                    "unit": "°C"
+                },
+                {
+                    "access": 1,
+                    "description": "Measured soil moisture value",
+                    "name": "soil_moisture",
+                    "property": "soil_moisture",
+                    "type": "numeric",
+                    "unit": "%"
+                },
+                {
+                    "access": 3,
+                    "description": "Temperature unit",
+                    "name": "temperature_unit",
+                    "property": "temperature_unit",
+                    "type": "enum",
+                    "values": [
+                        "celsius",
+                        "fahrenheit"
+                    ]
+                },
+                {
+                    "access": 1,
+                    "description": "Remaining battery in %, can take up to 24 hours before reported.",
+                    "name": "battery",
+                    "property": "battery",
+                    "type": "numeric",
+                    "unit": "%",
+                    "value_max": 100,
+                    "value_min": 0
+                },
+                {
+                    "access": 1,
+                    "description": "State of the battery",
+                    "name": "battery_state",
+                    "property": "battery_state",
+                    "type": "enum",
+                    "values": [
+                        "low",
+                        "medium",
+                        "high"
+                    ]
+                },
+                {
+                    "access": 1,
+                    "description": "Link quality (signal strength)",
+                    "name": "linkquality",
+                    "property": "linkquality",
+                    "type": "numeric",
+                    "unit": "lqi",
+                    "value_max": 255,
+                    "value_min": 0
+                }
+            ],
+            "model": "TS0601_soil",
+            "options": [
+                {
+                    "access": 2,
+                    "description": "Number of digits after decimal point for temperature, takes into effect on next report of device.",
+                    "name": "temperature_precision",
+                    "property": "temperature_precision",
+                    "type": "numeric",
+                    "value_max": 3,
+                    "value_min": 0
+                },
+                {
+                    "access": 2,
+                    "description": "Calibrates the temperature value (absolute offset), takes into effect on next report of device.",
+                    "name": "temperature_calibration",
+                    "property": "temperature_calibration",
+                    "type": "numeric"
+                }
+            ],
+            "supports_ota": false,
+            "vendor": "TuYa"
+        },
+        "disabled": false,
+        "endpoints": {
+            "1": {
+                "bindings": [],
+                "clusters": {
+                    "input": [
+                        "genGroups",
+                        "genScenes",
+                        "manuSpecificTuya",
+                        "genBasic"
+                    ],
+                    "output": [
+                        "genOta",
+                        "genTime"
+                    ]
+                },
+                "configured_reportings": [],
+                "scenes": []
+            }
+        },
+        "friendly_name": "Vlhkoměr",
+        "ieee_address": "0xa4c138c8a55e7a46",
+        "interview_completed": true,
+        "interviewing": false,
+        "manufacturer": "_TZE200_myd45weu",
+        "model_id": "TS0601",
+        "network_address": 13735,
+        "power_source": "Battery",
+        "supported": true,
+        "type": "EndDevice"
+    }
+]

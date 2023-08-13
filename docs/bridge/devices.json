@@ -1,0 +1,143 @@
+[
+  {
+    "definition": null,
+    "disabled": false,
+    "endpoints": {
+      "1": {
+        "bindings": [],
+        "clusters": {
+          "input": [
+            "genBasic",
+            "genIdentify",
+            "genOnOff",
+            "genTime",
+            "genOta",
+            "26",
+            "lightingColorCtrl"
+          ],
+          "output": [
+            "genBasic",
+            "genIdentify",
+            "genGroups",
+            "genScenes",
+            "genOnOff",
+            "genLevelCtrl",
+            "genPollCtrl",
+            "lightingColorCtrl",
+            "msIlluminanceMeasurement",
+            "msTemperatureMeasurement",
+            "msRelativeHumidity",
+            "msOccupancySensing",
+            "ssIasZone",
+            "haMeterIdentification",
+            "haApplianceStatistics",
+            "haElectricalMeasurement",
+            "seMetering",
+            "touchlink",
+            "manuSpecificUbisysDimmerSetup",
+            "manuSpecificSamsungAccelerometer"
+          ]
+        },
+        "configured_reportings": [],
+        "scenes": []
+      },
+      "242": {
+        "bindings": [],
+        "clusters": { "input": [], "output": ["greenPower"] },
+        "configured_reportings": [],
+        "scenes": []
+      }
+    },
+    "friendly_name": "Coordinator",
+    "ieee_address": "0xe0798dfffe7f47b2",
+    "interview_completed": true,
+    "interviewing": false,
+    "network_address": 0,
+    "supported": false,
+    "type": "Coordinator"
+  },
+  {
+    "date_code": "20201026",
+    "definition": {
+      "description": "Zigbee smart switch",
+      "exposes": [
+        {
+          "features": [
+            {
+              "access": 7,
+              "description": "On/off state of the switch",
+              "name": "state",
+              "property": "state",
+              "type": "binary",
+              "value_off": "OFF",
+              "value_on": "ON",
+              "value_toggle": "TOGGLE"
+            }
+          ],
+          "type": "switch"
+        },
+        {
+          "access": 7,
+          "description": "Controls the behavior when the device is powered on after power loss",
+          "name": "power_on_behavior",
+          "property": "power_on_behavior",
+          "type": "enum",
+          "values": ["off", "on", "toggle", "previous"]
+        },
+        {
+          "access": 1,
+          "description": "Link quality (signal strength)",
+          "name": "linkquality",
+          "property": "linkquality",
+          "type": "numeric",
+          "unit": "lqi",
+          "value_max": 255,
+          "value_min": 0
+        }
+      ],
+      "model": "BASICZBR3",
+      "options": [
+        {
+          "access": 2,
+          "description": "State actions will also be published as 'action' when true (default false).",
+          "name": "state_action",
+          "property": "state_action",
+          "type": "binary",
+          "value_off": false,
+          "value_on": true
+        }
+      ],
+      "supports_ota": false,
+      "vendor": "SONOFF"
+    },
+    "disabled": false,
+    "endpoints": {
+      "1": {
+        "bindings": [],
+        "clusters": {
+          "input": [
+            "genBasic",
+            "genIdentify",
+            "genGroups",
+            "genScenes",
+            "genOnOff"
+          ],
+          "output": ["genBasic"]
+        },
+        "configured_reportings": [],
+        "scenes": []
+      }
+    },
+    "friendly_name": "switch-1",
+    "ieee_address": "0x00124b00226c9a95",
+    "interview_completed": true,
+    "interviewing": false,
+    "manufacturer": "SONOFF",
+    "model_id": "BASICZBR3",
+    "network_address": 37720,
+    "power_source": "Mains (single phase)",
+    "software_build_id": "1.0.3",
+    "supported": true,
+    "type": "Router"
+  }
+]
