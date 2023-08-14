@@ -12,19 +12,30 @@ let devices: Device[];
 async function main() {
   zigbeeClient = mqtt.connect(config.ZIGBEE_BRIDGE_HOST, {
     port: config.ZIGBEE_BRIDGE_PORT,
+    connectTimeout: 20 * 1000,
+    keepalive: 30,
   });
 
   zigbeeClient.on("connect", function () {
+    console.log("connected");
     zigbeeClient.subscribe("zigbee2mqtt/#");
     //   zigbeeClient.subscribe("zigbee2mqtt/bridge/state")
   });
 
-  zigbeeClient.on("message", function (topic, message) {
+  zigbeeClient.on("error", function (err) {
+    console.error(err);
+  });
+  zigbeeClient.on("disconnect", function () {
+    console.log("disconnected");
+  });
+
+  zigbeeClient.on("message", async function (topic, message) {
     if (topic === "zigbee2mqtt/bridge/devices") {
       devices = JSON.parse(message.toString()) as unknown as Device[];
-      handleDevicesMessage(
-        devices,
-      );
+
+      console.log("Refreshing devices");
+      await shutdownDevices();
+      spawnDevices(devices);
     } else if (!topic.startsWith("zigbee2mqtt/bridge")) {
       const matched = topic.match(/^zigbee2mqtt\/([^\/]+)$/);
       if (matched) {
@@ -78,7 +89,7 @@ function publishSetBridge(friendly_name: string, propertyName: string) {
     );
 }
 
-async function handleDevicesMessage(devices: Device[]) {
+async function spawnDevices(devices: Device[]) {
   const platformDevices = await getDevices();
 
   for (const device of devices) {
@@ -136,10 +147,14 @@ Deno.addSignalListener("SIGINT", shutdownClients);
 Deno.addSignalListener("SIGTERM", shutdownClients);
 Deno.addSignalListener("SIGQUIT", shutdownClients);
 
-async function shutdownClients() {
+async function shutdownDevices() {
   console.log("Shuting down clients");
   const promises = instances.map((plat) => plat.disconnect());
   await Promise.all(promises);
+}
+
+async function shutdownClients() {
+  await shutdownDevices();
   await zigbeeClient.endAsync();
   Deno.exit(0);
 }
