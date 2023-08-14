@@ -155,7 +155,7 @@ async function shutdownDevices() {
 
 async function shutdownClients() {
   await shutdownDevices();
-  await zigbeeClient.endAsync();
+  zigbeeClient.end();
   Deno.exit(0);
 }
 
