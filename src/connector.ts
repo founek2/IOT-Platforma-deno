@@ -1,6 +1,6 @@
 import mqtt, { MqttClient } from "mqtt";
-import { config } from "./config";
-import { Device } from "./convertor";
+import { config } from "./config.ts";
+import { Device } from "./convertor.ts";
 
 export async function getDevices() {
   const res = await fetch(`${config.PLATFORM_API_HOST}/api/device`, {

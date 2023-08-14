@@ -1,8 +1,9 @@
-FROM node:20
+FROM denoland/deno
 
 WORKDIR /app
+USER deno
 
 COPY ./ ./
-RUN yarn
+RUN deno cache src/index.ts
 
-CMD ["yarn", "dev"] 
+CMD ["run", "--allow-net","--allow-read", "--allow-env", "src/index.ts"]

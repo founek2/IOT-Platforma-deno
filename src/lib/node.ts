@@ -1,4 +1,4 @@
-import { ComponentType, PropertyClass, PropertyDataType } from "./type";
+import { ComponentType, PropertyClass, PropertyDataType } from "./type.ts";
 
 export interface PropertyArgs {
   propertyId: string;

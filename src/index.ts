@@ -1,12 +1,12 @@
 import mqtt, { MqttClient } from "mqtt";
-import { config } from "./config";
-import { getDevices } from "./connector";
-import { assignProperty, Device } from "./convertor";
-import { Platform } from "./lib/connection";
-import { ComponentType, PropertyDataType } from "./lib/type";
+import { config } from "./config.ts";
+import { getDevices } from "./connector.ts";
+import { assignProperty, Device } from "./convertor.ts";
+import { Platform } from "./lib/connection.ts";
+import { ComponentType } from "./lib/type.ts";
 
 let zigbeeClient: MqttClient;
-let instances: Platform[] = [];
+const instances: Platform[] = [];
 
 async function main() {
   zigbeeClient = mqtt.connect(config.ZIGBEE_BRIDGE_HOST, {

@@ -3,11 +3,11 @@ import {
   PropertyDataType,
   ComponentType,
   DeviceCommand,
-} from "./type";
+} from "./type.ts";
 import * as mqtt from "mqtt";
-import { Node, PropertyArgs } from "./node";
-import { EventEmitter } from "events";
-import { localStorage } from "./storage";
+import { Node, PropertyArgs } from "./node.ts";
+import { EventEmitter } from "node:events";
+import { localStorage } from "./storage.ts";
 
 export enum DeviceStatus {
   disconnected = "disconnected",
@@ -22,7 +22,7 @@ export enum DeviceStatus {
 }
 
 function logger(...args: any) {
-  if (process.env.MODE != "test") console.log(...args);
+  if (Deno.env.get("MODE") != "test") console.log(...args);
 }
 interface store {
   apiKey: string;
@@ -49,8 +49,8 @@ export class Platform extends EventEmitter {
     mqttPort: number
   ) {
     super();
-    this.deviceId = process.env.DEVICE_ID || deviceId;
-    this.userName = process.env.USERNAME || userName;
+    this.deviceId = Deno.env.get("DEVICE_ID") || deviceId;
+    this.userName = Deno.env.get("USERNAME") || userName;
     this.deviceName = deviceName;
     this.mqttHost = mqttHost;
     this.mqttPort = mqttPort;
@@ -136,7 +136,7 @@ export class Platform extends EventEmitter {
             const { propertyId, settable, callback } = property;
             if (
               `${this.getDevicePrefix()}/${nodeId}/${propertyId}/set` ===
-                topic &&
+              topic &&
               settable
             ) {
               property.value = message;
@@ -155,7 +155,7 @@ export class Platform extends EventEmitter {
         // Invalid login
         logger("Invalid userName/password, forgeting apiKey");
 
-        if (process.env.NODE_ENV !== "production") {
+        if (Deno.env.get("NODE_ENV") !== "production") {
           client.end();
           this.forgot();
           this.connectPairing();
@@ -214,7 +214,7 @@ export class Platform extends EventEmitter {
       logger("error", err);
     });
 
-    client.on("connect", () => {});
+    client.on("connect", () => { });
 
     logger(
       "connecting as guest to",
@@ -314,7 +314,7 @@ export class Platform extends EventEmitter {
     this.setStatus(DeviceStatus.ready);
   };
 
-  publishPropertyData = (propertyId: string, value: string | Buffer) => {
+  publishPropertyData = (propertyId: string, value: string) => {
     const node = this.nodes.find(({ properties }) =>
       properties.some((prop) => prop.propertyId === propertyId)
     );
@@ -328,7 +328,7 @@ export class Platform extends EventEmitter {
     );
   };
 
-  publishSensorData = (propertyId: string, value: string | Buffer) => {
+  publishSensorData = (propertyId: string, value: string ) => {
     const node = this.nodes.find(
       ({ properties, componentType }) =>
         properties.some((prop) => prop.propertyId === propertyId) &&

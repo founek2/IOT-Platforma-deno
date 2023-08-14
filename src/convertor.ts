@@ -1,7 +1,20 @@
 import { MqttClient } from "mqtt";
-import { Platform } from "./lib/connection";
-import { Node } from "./lib/node";
-import { PropertyDataType } from "./lib/type";
+import { Platform } from "./lib/connection.ts";
+import { Node } from "./lib/node.ts";
+import { PropertyDataType } from "./lib/type.ts";
+import { config } from "./config.ts";
+// import translate from "translate";
+
+// const translate = await import("translate")
+
+// (async function () {
+//   const translation = await translate("soil moisture", {
+//     engine: "deepl", key: config.DEEPL_API_KEY, to: "cz"
+//   })
+//   console.log("translated", translation)
+// })()
+
+
 
 export interface Device {
   definition: DeviceDefinition | null;
