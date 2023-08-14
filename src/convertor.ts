@@ -104,7 +104,9 @@ export async function assignProperty(
     case "numeric":
       thing.addProperty({
         propertyId: expose.property,
-        dataType: PropertyDataType.float,
+        dataType: expose.property.includes("time")
+          ? PropertyDataType.string
+          : PropertyDataType.float,
         name: translatedName,
         settable: Boolean(expose.access & settableMask),
         unitOfMeasurement: expose.unit,
