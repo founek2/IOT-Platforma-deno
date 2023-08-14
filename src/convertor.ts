@@ -80,7 +80,7 @@ const settableMask = 1 << 1;
 export async function assignProperty(
   expose: DeviceExposesGeneric,
   thing: Node,
-  publishBridge: (value: string) => any,
+  publishBridge: (value: string) => void,
 ) {
   const translatedName = await translate(expose.name);
 

@@ -1,11 +1,6 @@
-import {
-  PropertyClass,
-  PropertyDataType,
-  ComponentType,
-  DeviceCommand,
-} from "./type.ts";
+import { ComponentType, DeviceCommand } from "./type.ts";
 import * as mqtt from "mqtt";
-import { Node, PropertyArgs } from "./node.ts";
+import { Node, Property, PropertyArgs } from "./node.ts";
 import { EventEmitter } from "node:events";
 import { localStorage } from "./storage.ts";
 
@@ -46,7 +41,7 @@ export class Platform extends EventEmitter {
     userName: string,
     deviceName: string,
     mqttHost: string,
-    mqttPort: number
+    mqttPort: number,
   ) {
     super();
     this.deviceId = Deno.env.get("DEVICE_ID") || deviceId;
@@ -61,7 +56,7 @@ export class Platform extends EventEmitter {
     if (storedItem) this.meta = JSON.parse(storedItem);
   }
 
-  init = async () => {
+  init = () => {
     if (!this.isPaired()) return this.connectPairing();
     return this.connect();
   };
@@ -109,10 +104,11 @@ export class Platform extends EventEmitter {
 
     this.nodes.forEach(({ nodeId, properties }) => {
       properties.forEach(({ propertyId, settable }) => {
-        if (settable)
+        if (settable) {
           client.subscribe(
-            `${this.getDevicePrefix()}/${nodeId}/${propertyId}/set`
+            `${this.getDevicePrefix()}/${nodeId}/${propertyId}/set`,
           );
+        }
       });
     });
 
@@ -136,14 +132,14 @@ export class Platform extends EventEmitter {
             const { propertyId, settable, callback } = property;
             if (
               `${this.getDevicePrefix()}/${nodeId}/${propertyId}/set` ===
-              topic &&
+                topic &&
               settable
             ) {
               property.value = message;
               if (callback) callback(property);
               client.publish(
                 `${this.getDevicePrefix()}/${nodeId}/${propertyId}`,
-                message
+                message,
               );
             }
           });
@@ -177,7 +173,7 @@ export class Platform extends EventEmitter {
     const node = this.addNode(
       "sensor" + ++this.sensorCnt,
       args.name,
-      ComponentType.sensor
+      ComponentType.sensor,
     );
     node.addProperty(args);
   };
@@ -186,14 +182,15 @@ export class Platform extends EventEmitter {
     if (this.status !== status) {
       this.status = status;
 
-      if (this.client)
+      if (this.client) {
         this.client.publish(`${this.getDevicePrefix()}/$state`, status);
+      }
     }
   };
 
   getDevicePrefix = () => `${this.prefix}/${this.deviceId}`;
 
-  connectPairing = async () => {
+  connectPairing = () => {
     this.client = mqtt.connect(this.mqttHost, {
       username: "guest=" + this.deviceId,
       password: this.userName,
@@ -214,14 +211,14 @@ export class Platform extends EventEmitter {
       logger("error", err);
     });
 
-    client.on("connect", () => { });
+    client.on("connect", () => {});
 
     logger(
       "connecting as guest to",
       this.mqttHost,
       this.mqttPort,
       this.userName,
-      this.deviceId
+      this.deviceId,
     );
     this.setStatus(DeviceStatus.init);
     client.subscribe(`${this.getDevicePrefix()}/$config/apiKey/set`);
@@ -231,18 +228,18 @@ export class Platform extends EventEmitter {
     client.publish(`${this.getDevicePrefix()}/$realm`, this.userName);
     client.publish(
       `${this.getDevicePrefix()}/$nodes`,
-      this.nodes.map((node) => node.nodeId).join()
+      this.nodes.map((node) => node.nodeId).join(),
     );
 
     this.nodes.forEach(({ nodeId, properties, componentType, name }) => {
       client.publish(`${this.getDevicePrefix()}/${nodeId}/$name`, name);
       client.publish(
         `${this.getDevicePrefix()}/${nodeId}/$type`,
-        componentType
+        componentType,
       );
       client.publish(
         `${this.getDevicePrefix()}/${nodeId}/$properties`,
-        properties.map((prop) => prop.propertyId).join()
+        properties.map((prop) => prop.propertyId).join(),
       );
       properties.forEach(
         ({
@@ -255,48 +252,55 @@ export class Platform extends EventEmitter {
           settable,
           retained,
         }) => {
-          if (name)
+          if (name) {
             client.publish(
               `${this.getDevicePrefix()}/${nodeId}/${propertyId}/$name`,
-              name
+              name,
             );
-          if (unitOfMeasurement)
+          }
+          if (unitOfMeasurement) {
             client.publish(
               `${this.getDevicePrefix()}/${nodeId}/${propertyId}/$unit`,
-              unitOfMeasurement
+              unitOfMeasurement,
             );
-          if (dataType)
+          }
+          if (dataType) {
             client.publish(
               `${this.getDevicePrefix()}/${nodeId}/${propertyId}/$datatype`,
-              dataType
+              dataType,
             );
-          if (propertyClass)
+          }
+          if (propertyClass) {
             client.publish(
               `${this.getDevicePrefix()}/${nodeId}/${propertyId}/$class`,
-              propertyClass
+              propertyClass,
             );
-          if (format)
+          }
+          if (format) {
             client.publish(
               `${this.getDevicePrefix()}/${nodeId}/${propertyId}/$format`,
-              format
+              format,
             );
-          if (settable)
+          }
+          if (settable) {
             client.publish(
               `${this.getDevicePrefix()}/${nodeId}/${propertyId}/$settable`,
-              settable.toString()
+              settable.toString(),
             );
+          }
 
-          if (retained)
+          if (retained) {
             client.publish(
               `${this.getDevicePrefix()}/${nodeId}/${propertyId}/$retained`,
-              retained.toString()
+              retained.toString(),
             );
-        }
+          }
+        },
       );
     });
     logger("meta", this.meta);
 
-    client.on("message", async (topic, message) => {
+    client.on("message", (topic, message) => {
       logger("message", topic, message.toString());
 
       if (this.getDevicePrefix() + "/$config/apiKey/set") {
@@ -314,33 +318,45 @@ export class Platform extends EventEmitter {
     this.setStatus(DeviceStatus.ready);
   };
 
-  publishPropertyData = (propertyId: string, value: string) => {
+  publishPropertyData = (
+    propertyId: string,
+    value: string | ((node: Node, property: Property) => string),
+  ) => {
     const node = this.nodes.find(({ properties }) =>
       properties.some((prop) => prop.propertyId === propertyId)
     );
-    if (!node)
+    const property = node?.properties.find((prop) =>
+      prop.propertyId === propertyId
+    );
+    if (!node || !property) {
       return logger(`unable to locate node with property ${propertyId}`);
+    }
+
     if (!this.client) return logger("Not connected");
 
+    const finalValue = typeof value === "function"
+      ? value(node, property)
+      : value;
     this.client.publish(
       `${this.getDevicePrefix()}/${node.nodeId}/${propertyId}`,
-      value
+      finalValue,
     );
   };
 
-  publishSensorData = (propertyId: string, value: string ) => {
+  publishSensorData = (propertyId: string, value: string) => {
     const node = this.nodes.find(
       ({ properties, componentType }) =>
         properties.some((prop) => prop.propertyId === propertyId) &&
-        componentType === ComponentType.sensor
+        componentType === ComponentType.sensor,
     );
-    if (!node)
+    if (!node) {
       return logger(`unable to locate sensor node with property ${propertyId}`);
+    }
     if (!this.client) return logger("Not connected");
 
     this.client.publish(
       `${this.getDevicePrefix()}/${node.nodeId}/${propertyId}`,
-      value
+      value,
     );
   };
   publishData = (nodeId: string, propertyId: string, value: string) => {
@@ -348,7 +364,7 @@ export class Platform extends EventEmitter {
 
     this.client.publish(
       `${this.getDevicePrefix()}/${nodeId}/${propertyId}`,
-      value
+      value,
     );
   };
 }

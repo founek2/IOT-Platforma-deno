@@ -1,12 +1,13 @@
 import mqtt, { MqttClient } from "mqtt";
 import { config } from "./config.ts";
 import { getDevices } from "./connector.ts";
-import { assignProperty, Device } from "./convertor.ts";
+import { assignProperty, Device, DeviceExposesGeneric } from "./convertor.ts";
 import { Platform } from "./lib/connection.ts";
-import { ComponentType } from "./lib/type.ts";
+import { ComponentType, PropertyDataType } from "./lib/type.ts";
 
 let zigbeeClient: MqttClient;
 const instances: Platform[] = [];
+let devices: Device[];
 
 async function main() {
   zigbeeClient = mqtt.connect(config.ZIGBEE_BRIDGE_HOST, {
@@ -20,21 +21,49 @@ async function main() {
 
   zigbeeClient.on("message", function (topic, message) {
     if (topic === "zigbee2mqtt/bridge/devices") {
+      devices = JSON.parse(message.toString()) as unknown as Device[];
       handleDevicesMessage(
-        JSON.parse(message.toString()) as unknown as Device[],
+        devices,
       );
     } else if (!topic.startsWith("zigbee2mqtt/bridge")) {
       const matched = topic.match(/^zigbee2mqtt\/([^\/]+)$/);
       if (matched) {
-        const [whole, friendly_name] = matched;
+        const [_whole, friendly_name] = matched;
         const plat = instances.find((p) => p.deviceName === friendly_name);
         if (!plat) return;
 
-        const data = JSON.parse(message.toString());
-        Object.entries(data).forEach(([propertyId, value]) => {
+        const data: { [key: string]: string | number | boolean } = JSON.parse(
+          message.toString(),
+        );
+        console.log("instance", data);
+        Object.entries(data).forEach(([propertyId, valueAny]) => {
+          const value = valueAny.toString();
+
           plat.publishPropertyData(
             propertyId,
-            (value as string | boolean | number).toString(),
+            (_node, property) => {
+              const device = devices.find((d) =>
+                d.friendly_name === friendly_name
+              );
+              const exposes = device?.definition?.exposes.find((expose) =>
+                (expose as DeviceExposesGeneric)?.name === propertyId
+              );
+              if (!exposes) return value;
+
+              if (
+                exposes.type === "binary" &&
+                property.dataType !== PropertyDataType.boolean
+              ) {
+                console.log(exposes.value_on === value);
+                if (exposes.value_on === value) {
+                  return "true";
+                } else if (exposes.value_off === value) {
+                  return "false";
+                }
+              }
+
+              return value;
+            },
           );
         });
       }
