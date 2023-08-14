@@ -1,20 +1,19 @@
-import { MqttClient } from "mqtt";
-import { Platform } from "./lib/connection.ts";
 import { Node } from "./lib/node.ts";
 import { PropertyDataType } from "./lib/type.ts";
 import { config } from "./config.ts";
-// import translate from "translate";
+import translateDeepl from "translate";
 
 // const translate = await import("translate")
 
-// (async function () {
-//   const translation = await translate("soil moisture", {
-//     engine: "deepl", key: config.DEEPL_API_KEY, to: "cz"
-//   })
-//   console.log("translated", translation)
-// })()
+function translate(text: string) {
+  if (!config.DEEPL_API_KEY) return text;
 
-
+  return translateDeepl(text, {
+    engine: "deepl",
+    key: config.DEEPL_API_KEY,
+    to: "cs",
+  });
+}
 
 export interface Device {
   definition: DeviceDefinition | null;
@@ -78,17 +77,19 @@ export interface DeviceExposesSwitch {
 
 const settableMask = 1 << 1;
 
-export function assignProperty(
+export async function assignProperty(
   expose: DeviceExposesGeneric,
   thing: Node,
-  publishBridge: (value: string) => any
+  publishBridge: (value: string) => any,
 ) {
+  const translatedName = await translate(expose.name);
+
   switch (expose.type) {
     case "enum":
       thing.addProperty({
         propertyId: expose.property,
         dataType: PropertyDataType.enum,
-        name: expose.name,
+        name: translatedName,
         settable: Boolean(expose.access & settableMask),
         format: expose.values?.join(","),
         callback: (prop) => {
@@ -101,7 +102,7 @@ export function assignProperty(
       thing.addProperty({
         propertyId: expose.property,
         dataType: PropertyDataType.float,
-        name: expose.name,
+        name: translatedName,
         settable: Boolean(expose.access & settableMask),
         unitOfMeasurement: expose.unit,
         callback: (prop) => {
@@ -114,7 +115,7 @@ export function assignProperty(
       thing.addProperty({
         propertyId: expose.property,
         dataType: PropertyDataType.boolean,
-        name: expose.name,
+        name: translatedName,
         settable: Boolean(expose.access & settableMask),
         callback: (prop) => {
           console.log("recieved binary:", prop.value);
@@ -127,7 +128,7 @@ export function assignProperty(
       thing.addProperty({
         propertyId: expose.property,
         dataType: PropertyDataType.string,
-        name: expose.name,
+        name: translatedName,
         settable: Boolean(expose.access & settableMask),
         callback: (prop) => {
           console.log("recieved text:", prop.value);

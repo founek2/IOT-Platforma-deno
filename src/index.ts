@@ -19,15 +19,14 @@ async function main() {
   });
 
   zigbeeClient.on("message", function (topic, message) {
-    if (topic === "zigbee2mqtt/bridge/devices")
+    if (topic === "zigbee2mqtt/bridge/devices") {
       handleDevicesMessage(
-        JSON.parse(message.toString()) as unknown as Device[]
+        JSON.parse(message.toString()) as unknown as Device[],
       );
-    else if (!topic.startsWith("zigbee2mqtt/bridge")) {
+    } else if (!topic.startsWith("zigbee2mqtt/bridge")) {
       const matched = topic.match(/^zigbee2mqtt\/([^\/]+)$/);
       if (matched) {
         const [whole, friendly_name] = matched;
-        console.log(`${friendly_name} got state ${message.toString()}`);
         const plat = instances.find((p) => p.deviceName === friendly_name);
         if (!plat) return;
 
@@ -35,7 +34,7 @@ async function main() {
         Object.entries(data).forEach(([propertyId, value]) => {
           plat.publishPropertyData(
             propertyId,
-            (value as string | boolean | number).toString()
+            (value as string | boolean | number).toString(),
           );
         });
       }
@@ -47,20 +46,17 @@ function publishSetBridge(friendly_name: string, propertyName: string) {
   return (value: string) =>
     zigbeeClient.publish(
       `zigbee2mqtt/${friendly_name}/set/${propertyName}`,
-      value
+      value,
     );
 }
 
 async function handleDevicesMessage(devices: Device[]) {
-  console.log("message", devices);
-
   const platformDevices = await getDevices();
-  console.log(platformDevices);
 
   for (const device of devices) {
     // TODO delete api key when not paired
     const paired = platformDevices.find(
-      (d) => d.metadata.deviceId === device.ieee_address
+      (d) => d.metadata.deviceId === device.ieee_address,
     );
 
     const plat = new Platform(
@@ -68,38 +64,38 @@ async function handleDevicesMessage(devices: Device[]) {
       config.PLATFORM_USERNAME,
       device.friendly_name || device.ieee_address,
       config.PLATFORM_MQTT_HOST,
-      config.PLATFORM_MQTT_PORT
+      config.PLATFORM_MQTT_PORT,
     );
     instances.push(plat);
 
     const thing = plat.addNode(
       device.friendly_name || "Node",
       device.friendly_name || "Node",
-      ComponentType.generic
+      ComponentType.generic,
     );
 
     for (let node of device.definition?.exposes || []) {
       switch (node.type) {
         case "switch":
           for (const property of node.features) {
-            assignProperty(
+            await assignProperty(
               property,
               thing,
               publishSetBridge(
                 device.friendly_name || device.ieee_address,
-                property.name
-              )
+                property.name,
+              ),
             );
           }
           break;
         default:
-          assignProperty(
+          await assignProperty(
             node,
             thing,
             publishSetBridge(
               device.friendly_name || device.ieee_address,
-              node.name
-            )
+              node.name,
+            ),
           );
       }
     }

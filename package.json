@@ -3,7 +3,7 @@
   "packageManager": "yarn@3.4.1",
   "type": "module",
   "scripts": {
-    "dev": "deno run --allow-read --allow-env --allow-net ./src/index.ts",
+    "dev": "deno run --watch --allow-read --allow-env --allow-net ./src/index.ts",
     "build": "tsc -b",
     "start": "node dist/index.js"
   },
