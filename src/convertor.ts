@@ -8,7 +8,7 @@ import translateDeepl from "translate";
 function translate(text: string) {
   if (!config.DEEPL_API_KEY) return text;
 
-  return translateDeepl(text, {
+  return translateDeepl(text.replace("_", ""), {
     engine: "deepl",
     key: config.DEEPL_API_KEY,
     to: "cs",
