@@ -30,6 +30,8 @@ async function main() {
   });
 
   zigbeeClient.on("message", async function (topic, message) {
+    console.log("message", topic);
+
     if (topic === "zigbee2mqtt/bridge/devices") {
       devices = JSON.parse(message.toString()) as unknown as Device[];
 
