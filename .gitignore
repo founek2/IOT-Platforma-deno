@@ -68,3 +68,6 @@ packages/*/*.tsbuildinfo
 .VSCodeCounter
 build.zip
 assets.zip
+
+# api key storage
+local-storage

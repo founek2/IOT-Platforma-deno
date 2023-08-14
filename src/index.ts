@@ -1,4 +1,4 @@
-import mqtt, { MqttClient } from "mqtt";
+import mqtt, { MqttClient } from "npm:mqtt@5";
 import { config } from "./config.ts";
 import { getDevices } from "./connector.ts";
 import { assignProperty, Device, DeviceExposesGeneric } from "./convertor.ts";
@@ -35,7 +35,7 @@ async function main() {
         const data: { [key: string]: string | number | boolean } = JSON.parse(
           message.toString(),
         );
-        console.log("instance", data);
+
         Object.entries(data).forEach(([propertyId, valueAny]) => {
           const value = valueAny.toString();
 
@@ -46,15 +46,14 @@ async function main() {
                 d.friendly_name === friendly_name
               );
               const exposes = device?.definition?.exposes.find((expose) =>
-                (expose as DeviceExposesGeneric)?.name === propertyId
+                (expose as DeviceExposesGeneric)?.property === propertyId
               );
               if (!exposes) return value;
 
               if (
                 exposes.type === "binary" &&
-                property.dataType !== PropertyDataType.boolean
+                property.dataType === PropertyDataType.boolean
               ) {
-                console.log(exposes.value_on === value);
                 if (exposes.value_on === value) {
                   return "true";
                 } else if (exposes.value_off === value) {

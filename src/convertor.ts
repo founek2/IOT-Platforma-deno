@@ -8,7 +8,10 @@ import translateDeepl from "translate";
 function translate(text: string) {
   if (!config.DEEPL_API_KEY) return text;
 
-  return translateDeepl(text.replace("_", ""), {
+  if (text === "linkquality") return "Síla signálu";
+  if (text === "state") return "stav";
+
+  return translateDeepl(text.replace(/_/g, " "), {
     engine: "deepl",
     key: config.DEEPL_API_KEY,
     to: "cs",

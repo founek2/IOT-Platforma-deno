@@ -1,8 +1,9 @@
 import { ComponentType, DeviceCommand } from "./type.ts";
-import * as mqtt from "mqtt";
+import * as mqtt from "npm:mqtt@5";
 import { Node, Property, PropertyArgs } from "./node.ts";
 import { EventEmitter } from "node:events";
 import { localStorage } from "./storage.ts";
+import { Buffer } from "https://deno.land/std@0.177.0/node/buffer.ts";
 
 export enum DeviceStatus {
   disconnected = "disconnected",
@@ -87,7 +88,7 @@ export class Platform extends EventEmitter {
       rejectUnauthorized: false,
       will: {
         topic: "v2/" + this.userName + "/" + this.deviceId + "/$state",
-        payload: DeviceStatus.lost,
+        payload: Buffer.from(DeviceStatus.lost),
         retain: true,
         qos: 1,
       },
@@ -199,7 +200,7 @@ export class Platform extends EventEmitter {
       rejectUnauthorized: false,
       will: {
         topic: `${this.getDevicePrefix()}/$state`,
-        payload: DeviceStatus.lost,
+        payload: Buffer.from(DeviceStatus.lost),
         retain: true,
         qos: 1,
       },
