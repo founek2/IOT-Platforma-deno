@@ -1,7 +1,6 @@
 FROM denoland/deno
 
 WORKDIR /app
-USER deno
 
 COPY ./ ./
 RUN deno cache src/index.ts
