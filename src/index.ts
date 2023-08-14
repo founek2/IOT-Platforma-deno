@@ -133,3 +133,14 @@ async function handleDevicesMessage(devices: Device[]) {
 }
 
 main();
+
+Deno.addSignalListener("SIGINT", shutdownClients);
+Deno.addSignalListener("SIGTERM", shutdownClients);
+
+async function shutdownClients() {
+  console.log("Shuting down clients");
+  const promises = instances.map((plat) => plat.disconnect());
+  await Promise.all(promises);
+  await zigbeeClient.endAsync();
+  Deno.exit(0);
+}

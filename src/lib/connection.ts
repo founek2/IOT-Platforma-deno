@@ -368,10 +368,9 @@ export class Platform extends EventEmitter {
       value,
     );
   };
-}
 
-function sleep(ms: number) {
-  return new Promise((resolve) => {
-    setTimeout(resolve, ms);
-  });
+  disconnect = () => {
+    this.setStatus(DeviceStatus.disconnected);
+    return this.client.endAsync();
+  };
 }
