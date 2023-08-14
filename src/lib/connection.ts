@@ -1,5 +1,5 @@
 import { ComponentType, DeviceCommand } from "./type.ts";
-import * as mqtt from "npm:mqtt@5";
+import * as mqtt from "npm:mqtt@4";
 import { Node, Property, PropertyArgs } from "./node.ts";
 import { EventEmitter } from "node:events";
 import { localStorage } from "./storage.ts";

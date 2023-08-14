@@ -1,4 +1,4 @@
-import mqtt, { MqttClient } from "npm:mqtt@5";
+import mqtt, { MqttClient } from "npm:mqtt@4";
 import { config } from "./config.ts";
 import { getDevices } from "./connector.ts";
 import { assignProperty, Device, DeviceExposesGeneric } from "./convertor.ts";
