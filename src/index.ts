@@ -12,8 +12,6 @@ let devices: Device[];
 async function main() {
   zigbeeClient = mqtt.connect(config.ZIGBEE_BRIDGE_HOST, {
     port: config.ZIGBEE_BRIDGE_PORT,
-    connectTimeout: 20 * 1000,
-    keepalive: 30,
   });
 
   zigbeeClient.on("connect", function () {
