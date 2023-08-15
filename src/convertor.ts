@@ -101,16 +101,14 @@ export async function assignProperty(
         },
       });
       break;
-    case "numeric": {
-      const settable = Boolean(expose.access & settableMask);
+    case "numeric":
       thing.addProperty({
         propertyId: expose.property,
-        // some devices advertise as numberic even time in format "00:00:00"
-        dataType: settable ? PropertyDataType.float
-          : PropertyDataType.string
-        ,
+        dataType: expose.property.includes("time") || expose.property.includes("duration")
+          ? PropertyDataType.string
+          : PropertyDataType.float,
         name: translatedName,
-        settable,
+        settable: Boolean(expose.access & settableMask),
         unitOfMeasurement: expose.unit,
         callback: (prop) => {
           console.log("recieved float:", prop.value);
@@ -118,7 +116,6 @@ export async function assignProperty(
         },
       });
       break;
-    }
     case "binary":
       thing.addProperty({
         propertyId: expose.property,
