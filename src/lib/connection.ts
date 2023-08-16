@@ -277,6 +277,6 @@ export class Platform extends EventEmitter {
 
   disconnect = () => {
     this.setStatus(DeviceStatus.disconnected);
-    return this.client.end();
+    return new Promise<void>(resolve => this.client.end(false, undefined, () => resolve()));
   };
 }
