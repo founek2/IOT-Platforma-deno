@@ -17,9 +17,6 @@ export const config = {
 
 assert(Deno.env.get("IOT_PLATFORM_API_KEY"), "missing env IOT_PLATFORM_API_KEY");
 assert(Deno.env.get("IOT_PLATFORM_API_HOST"), "missing env IOT_PLATFORM_API_HOST");
-assert(
-  Deno.env.get("IOT_PLATFORM_MQTT_HOST"),
-  "missing env IOT_PLATFORM_MQTT_HOST"
-);
+assert(Deno.env.get("IOT_PLATFORM_MQTT_HOST"), "missing env IOT_PLATFORM_MQTT_HOST");
 assert(Deno.env.get("IOT_PLATFORM_USERNAME"), "missing env IOT_PLATFORM_USERNAME");
 assert(Deno.env.get("ZIGBEE_BRIDGE_HOST"), "missing env ZIGBEE_BRIDGE_HOST");

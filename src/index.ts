@@ -1,6 +1,5 @@
-import mqtt, { MqttClient } from "npm:mqtt@4";
+import mqtt from "npm:mqtt@4";
 import { config } from "./config.ts";
-import { getDevices } from "./connector.ts";
 import { assignProperty, Device, DeviceExposesGeneric } from "./convertor.ts";
 import { Platform } from "./lib/connection.ts";
 import { ComponentType, PropertyDataType } from "./lib/type.ts";
@@ -85,7 +84,7 @@ function publishSetToZigbee(friendly_name: string, propertyName: string) {
 }
 
 async function spawnDevices(devices: Device[]) {
-  const platformDevices = await getDevices();
+  // const platformDevices = await getDevices();
 
   for (const device of devices) {
     // TODO delete api key when not paired
