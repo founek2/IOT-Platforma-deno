@@ -227,6 +227,11 @@ export class Platform extends EventEmitter {
 
     this.advertise()
 
+    this.nodes.forEach((node) => {
+      // Only allow publishing values, do not allow setting
+      node.updateClient(this.getDevicePrefix(), this.client)
+    });
+
     logger("meta", this.meta);
 
     client.on("message", (topic, message) => {
