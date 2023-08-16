@@ -5,83 +5,78 @@ import { assignProperty, Device, DeviceExposesGeneric } from "./convertor.ts";
 import { Platform } from "./lib/connection.ts";
 import { ComponentType, PropertyDataType } from "./lib/type.ts";
 
-let zigbeeClient: MqttClient;
 const instances: Platform[] = [];
 let devices: Device[];
 
-async function main() {
-  zigbeeClient = mqtt.connect(config.ZIGBEE_BRIDGE_HOST, {
-    port: config.ZIGBEE_BRIDGE_PORT,
-  });
 
-  zigbeeClient.on("connect", function () {
-    console.log("connected");
-    zigbeeClient.subscribe("zigbee2mqtt/#");
-    //   zigbeeClient.subscribe("zigbee2mqtt/bridge/state")
-  });
+const zigbeeClient = mqtt.connect(config.ZIGBEE_BRIDGE_HOST, {
+  port: config.ZIGBEE_BRIDGE_PORT,
+});
 
-  zigbeeClient.on("error", function (err) {
-    console.error(err);
-  });
-  zigbeeClient.on("disconnect", function () {
-    console.log("disconnected");
-  });
+zigbeeClient.on("connect", function () {
+  console.log("connected");
+  zigbeeClient.subscribe("zigbee2mqtt/#");
+});
 
-  zigbeeClient.on("message", async function (topic, message) {
-    console.log("message", topic);
+zigbeeClient.on("error", function (err) {
+  console.error("Zigbee connection failed", err);
+});
 
-    if (topic === "zigbee2mqtt/bridge/devices") {
-      devices = JSON.parse(message.toString()) as unknown as Device[];
+zigbeeClient.on("disconnect", function () {
+  console.log("Zigbee connection disconnected");
+});
 
-      console.log("Refreshing devices");
-      await shutdownDevices();
-      spawnDevices(devices);
-    } else if (!topic.startsWith("zigbee2mqtt/bridge")) {
-      const matched = topic.match(/^zigbee2mqtt\/([^\/]+)$/);
-      if (matched) {
-        const [_whole, friendly_name] = matched;
-        const plat = instances.find((p) => p.deviceName === friendly_name);
-        if (!plat) return;
+zigbeeClient.on("message", async function (topic, message) {
+  if (!topic.includes("logging")) console.log("message", topic);
 
-        const data: { [key: string]: string | number | boolean } = JSON.parse(
-          message.toString(),
-        );
+  if (topic === "zigbee2mqtt/bridge/devices") {
+    devices = JSON.parse(message.toString()) as unknown as Device[];
 
-        Object.entries(data).forEach(([propertyId, valueAny]) => {
-          const value = valueAny.toString();
+    console.log("Refreshing devices");
+    await shutdownDevices();
+    spawnDevices(devices);
+  } else if (!topic.startsWith("zigbee2mqtt/bridge")) {
+    const matched = topic.match(/^zigbee2mqtt\/([^\/]+)$/);
+    if (!matched) return;
+    const [_whole, friendly_name] = matched;
+    const plat = instances.find((p) => p.deviceName === friendly_name);
+    if (!plat) return;
 
-          plat.publishPropertyData(
-            propertyId,
-            (_node, property) => {
-              const device = devices.find((d) =>
-                d.friendly_name === friendly_name
-              );
-              const exposes = device?.definition?.exposes.find((expose) =>
-                (expose as DeviceExposesGeneric)?.property === propertyId
-              );
-              if (!exposes) return value;
+    const data: { [key: string]: string | number | boolean } = JSON.parse(message.toString());
+    Object.entries(data).forEach(([propertyId, valueAny]) => {
+      const value = valueAny.toString();
 
-              if (
-                exposes.type === "binary" &&
-                property.dataType === PropertyDataType.boolean
-              ) {
-                if (exposes.value_on === value) {
-                  return "true";
-                } else if (exposes.value_off === value) {
-                  return "false";
-                }
-              }
-
-              return value;
-            },
+      plat.publishPropertyData(
+        propertyId,
+        (_node, property) => {
+          const device = devices.find((d) =>
+            d.friendly_name === friendly_name
           );
-        });
-      }
-    }
-  });
-}
+          const exposes = device?.definition?.exposes.find((expose) =>
+            (expose as DeviceExposesGeneric)?.property === propertyId
+          );
+          if (!exposes) return value;
 
-function publishSetBridge(friendly_name: string, propertyName: string) {
+          if (
+            exposes.type === "binary" &&
+            property.dataType === PropertyDataType.boolean
+          ) {
+            if (exposes.value_on === value) {
+              return "true";
+            } else if (exposes.value_off === value) {
+              return "false";
+            }
+          }
+
+          return value;
+        },
+      );
+    });
+  }
+});
+
+
+function publishSetToZigbee(friendly_name: string, propertyName: string) {
   return (value: string) =>
     zigbeeClient.publish(
       `zigbee2mqtt/${friendly_name}/set/${propertyName}`,
@@ -94,14 +89,15 @@ async function spawnDevices(devices: Device[]) {
 
   for (const device of devices) {
     // TODO delete api key when not paired
-    const paired = platformDevices.find(
-      (d) => d.metadata.deviceId === device.ieee_address,
-    );
+    // const paired = platformDevices.find(
+    //   (d) => d.metadata.deviceId === device.ieee_address,
+    // );
+    const friendly_name = device.friendly_name || device.ieee_address;
 
     const plat = new Platform(
       device.ieee_address,
       config.PLATFORM_USERNAME,
-      device.friendly_name || device.ieee_address,
+      friendly_name,
       config.PLATFORM_MQTT_HOST,
       config.PLATFORM_MQTT_PORT,
     );
@@ -113,17 +109,14 @@ async function spawnDevices(devices: Device[]) {
       ComponentType.generic,
     );
 
-    for (let node of device.definition?.exposes || []) {
+    for (const node of device.definition?.exposes || []) {
       switch (node.type) {
         case "switch":
           for (const property of node.features) {
             await assignProperty(
               property,
               thing,
-              publishSetBridge(
-                device.friendly_name || device.ieee_address,
-                property.name,
-              ),
+              publishSetToZigbee(friendly_name, property.name),
             );
           }
           break;
@@ -131,10 +124,7 @@ async function spawnDevices(devices: Device[]) {
           await assignProperty(
             node,
             thing,
-            publishSetBridge(
-              device.friendly_name || device.ieee_address,
-              node.name,
-            ),
+            publishSetToZigbee(friendly_name, node.name),
           );
       }
     }
@@ -159,4 +149,3 @@ async function shutdownClients() {
   Deno.exit(0);
 }
 
-main();
