@@ -3,7 +3,6 @@ import * as mqtt from "npm:mqtt@4";
 import { Node } from "./node.ts";
 import { EventEmitter } from "node:events";
 import { localStorage } from "./storage.ts";
-import { Buffer } from "https://deno.land/std@0.177.0/node/buffer.ts";
 import { Property, PropertyArgs } from "./property.ts";
 import { MqttClient } from "npm:mqtt@4";
 
@@ -93,7 +92,7 @@ export class Platform extends EventEmitter {
       rejectUnauthorized: false,
       will: {
         topic: "v2/" + this.userName + "/" + this.deviceId + "/$state",
-        payload: Buffer.from(DeviceStatus.lost),
+        payload: DeviceStatus.lost,
         retain: true,
         qos: 1,
       },
@@ -195,11 +194,10 @@ export class Platform extends EventEmitter {
       username: "guest=" + this.deviceId,
       password: this.userName,
       port: this.mqttPort,
-      connectTimeout: 20 * 1000,
       rejectUnauthorized: false,
       will: {
         topic: `${this.getDevicePrefix()}/$state`,
-        payload: Buffer.from(DeviceStatus.lost),
+        payload: DeviceStatus.lost,
         retain: true,
         qos: 1,
       }
@@ -277,6 +275,6 @@ export class Platform extends EventEmitter {
 
   disconnect = () => {
     this.setStatus(DeviceStatus.disconnected);
-    return new Promise<void>(resolve => this.client.end(false, undefined, () => resolve()));
+    this.client.end()
   };
 }

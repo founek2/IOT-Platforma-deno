@@ -1,9 +1,7 @@
 import { Node } from "./lib/node.ts";
 import { PropertyDataType } from "./lib/type.ts";
 import { config } from "./config.ts";
-import translateDeepl from "translate";
-
-// const translate = await import("translate")
+import translateDeepl from "npm:translate";
 
 function translate(text: string) {
   if (!config.DEEPL_API_KEY) return text;
