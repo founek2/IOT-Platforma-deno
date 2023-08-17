@@ -1,10 +1,11 @@
 import { ComponentType, DeviceCommand } from "./type.ts";
-import * as mqtt from "npm:mqtt@4";
+import * as mqtt from "npm:mqtt@5";
 import { Node } from "./node.ts";
 import { EventEmitter } from "node:events";
 import { localStorage } from "./storage.ts";
 import { Property, PropertyArgs } from "./property.ts";
-import { MqttClient } from "npm:mqtt@4";
+import { Buffer } from "node:buffer";
+
 
 export enum DeviceStatus {
   disconnected = "disconnected",
@@ -23,10 +24,6 @@ function logger(...args: any) {
 }
 interface store {
   apiKey: string;
-}
-
-export interface Internal {
-  client?: MqttClient
 }
 
 export class Platform extends EventEmitter {
@@ -77,6 +74,24 @@ export class Platform extends EventEmitter {
     localStorage.removeItem(this.deviceId);
   };
 
+  createMqttInstance = (userName: string, password: string) => {
+    if (this.client) this.client.end(true);
+
+    return mqtt.connect(this.mqttHost, {
+      username: userName,
+      password: password,
+      port: this.mqttPort,
+      rejectUnauthorized: false,
+      keepalive: 20,
+      will: {
+        topic: "v2/" + this.userName + "/" + this.deviceId + "/$state",
+        payload: Buffer.from(DeviceStatus.lost, "utf-8"),
+        retain: true,
+        qos: 1,
+      },
+    })
+  }
+
   connect = () => {
     if (this.meta === null) {
       logger("cant connect without apiKey");
@@ -84,19 +99,20 @@ export class Platform extends EventEmitter {
     }
 
     this.prefix = `v2/${this.userName}`;
+    this.client = this.createMqttInstance(`device=${this.userName}/${this.deviceId}`, this.meta.apiKey)
 
-    this.client = mqtt.connect(this.mqttHost, {
-      username: "device=" + this.userName + "/" + this.deviceId,
-      password: this.meta.apiKey,
-      port: this.mqttPort,
-      rejectUnauthorized: false,
-      will: {
-        topic: "v2/" + this.userName + "/" + this.deviceId + "/$state",
-        payload: DeviceStatus.lost,
-        retain: true,
-        qos: 1,
-      },
-    });
+    // this.client = mqtt.connect(this.mqttHost, {
+    //   username: "device=" + this.userName + "/" + this.deviceId,
+    //   password: this.meta.apiKey,
+    //   port: this.mqttPort,
+    //   rejectUnauthorized: false,
+    //   will: {
+    //     topic: "v2/" + this.userName + "/" + this.deviceId + "/$state",
+    //     payload: Buffer.from(DeviceStatus.lost, "utf-8"),
+    //     retain: true,
+    //     qos: 1,
+    //   },
+    // });
     const client = this.client;
 
     this.setStatus(DeviceStatus.init);
@@ -190,18 +206,20 @@ export class Platform extends EventEmitter {
   }
 
   connectPairing = () => {
-    this.client = mqtt.connect(this.mqttHost, {
-      username: "guest=" + this.deviceId,
-      password: this.userName,
-      port: this.mqttPort,
-      rejectUnauthorized: false,
-      will: {
-        topic: `${this.getDevicePrefix()}/$state`,
-        payload: DeviceStatus.lost,
-        retain: true,
-        qos: 1,
-      }
-    });
+    this.client = this.createMqttInstance("guest=" + this.deviceId, this.userName)
+
+    // this.client = mqtt.connect(this.mqttHost, {
+    //   username: "guest=" + this.deviceId,
+    //   password: this.userName,
+    //   port: this.mqttPort,
+    //   rejectUnauthorized: false,
+    //   will: {
+    //     topic: `${this.getDevicePrefix()}/$state`,
+    //     payload: new Buffer(new TextEncoder().encode(DeviceStatus.lost)),
+    //     retain: true,
+    //     qos: 1,
+    //   }
+    // });
     const client = this.client;
 
     client.on("error", function (err) {

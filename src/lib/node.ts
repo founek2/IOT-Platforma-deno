@@ -1,4 +1,4 @@
-import { MqttClient } from "npm:mqtt@4";
+import { MqttClient } from "npm:mqtt@5";
 import { ComponentType } from "./type.ts";
 import { Property, PropertyArgs } from "./property.ts";
 

@@ -91,10 +91,15 @@ export class Property {
             if (this.callback) this.callback(this);
             client.publish(propertyPrefix, newValue)
         })
+        client.on("reconnect", () => console.log("reconnected"))
     }
 
     setValue = (newValue: string) => {
-        if (this.propertyTopic && this.client) this.client.publish(this.propertyTopic, newValue)
+        if (this.propertyTopic && this.client) {
+            if (this.client.connected)
+                this.client.publish(this.propertyTopic, newValue)
+            else console.log("Ignoring setValue, client not connected")
+        }
         this.value = newValue;
     }
 

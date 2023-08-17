@@ -1,4 +1,4 @@
-import mqtt from "npm:mqtt@4";
+import mqtt from "npm:mqtt@5";
 import { config } from "./config.ts";
 import { assignProperty, Device, DeviceExposesGeneric } from "./convertor.ts";
 import { Platform } from "./lib/connection.ts";
@@ -13,16 +13,17 @@ const zigbeeClient = mqtt.connect(config.ZIGBEE_BRIDGE_HOST, {
 });
 
 zigbeeClient.on("connect", function () {
-  console.log("connected");
+  console.log("zigbeeClient connected");
   zigbeeClient.subscribe("zigbee2mqtt/#");
 });
+zigbeeClient.on("reconnect", () => console.log("zigbeeClient reconnected"))
 
 zigbeeClient.on("error", function (err) {
-  console.error("Zigbee connection failed", err);
+  console.error("zigbeeClient error", err);
 });
 
 zigbeeClient.on("disconnect", function () {
-  console.log("Zigbee connection disconnected");
+  console.log("zigbeeClient disconnected");
 });
 
 zigbeeClient.on("message", async function (topic, message) {
