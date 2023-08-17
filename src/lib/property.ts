@@ -1,4 +1,4 @@
-import { MqttClient } from "npm:mqtt@4";
+import { MqttClient } from "npm:mqtt@5";
 import { PropertyClass, PropertyDataType } from "./type.ts";
 
 export interface PropertyArgs {
