@@ -96,7 +96,7 @@ export class Property {
 
     setValue = (newValue: string) => {
         if (this.propertyTopic && this.client) {
-            if (this.client.connected)
+            if (!this.client.disconnected && !this.client.disconnecting)
                 this.client.publish(this.propertyTopic, newValue)
             else console.log("Ignoring setValue, client not connected")
         }
