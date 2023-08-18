@@ -77,7 +77,7 @@ export class Platform extends EventEmitter {
   createMqttInstance = (userName: string, password: string) => {
     if (this.client) this.client.end(true);
 
-    return mqtt.connect(this.mqttHost, {
+    const client = mqtt.connect(this.mqttHost, {
       username: userName,
       password: password,
       port: this.mqttPort,
@@ -90,6 +90,24 @@ export class Platform extends EventEmitter {
         qos: 1,
       },
     })
+
+    client.on("disconnect", () => {
+      console.log("client disconnected iot")
+    })
+
+    client.on("reconnect", () => {
+      console.log("client reconnected iot")
+    })
+
+    client.on("connect", () => {
+      console.log("client connected iot")
+    })
+
+    client.on("error", () => {
+      console.log("client error iot")
+    })
+
+    this.client = client;
   }
 
   connect = () => {
@@ -99,7 +117,7 @@ export class Platform extends EventEmitter {
     }
 
     this.prefix = `v2/${this.userName}`;
-    this.client = this.createMqttInstance(`device=${this.userName}/${this.deviceId}`, this.meta.apiKey)
+    this.createMqttInstance(`device=${this.userName}/${this.deviceId}`, this.meta.apiKey)
 
     // this.client = mqtt.connect(this.mqttHost, {
     //   username: "device=" + this.userName + "/" + this.deviceId,
@@ -206,7 +224,7 @@ export class Platform extends EventEmitter {
   }
 
   connectPairing = () => {
-    this.client = this.createMqttInstance("guest=" + this.deviceId, this.userName)
+    this.createMqttInstance("guest=" + this.deviceId, this.userName)
 
     // this.client = mqtt.connect(this.mqttHost, {
     //   username: "guest=" + this.deviceId,
@@ -221,12 +239,6 @@ export class Platform extends EventEmitter {
     //   }
     // });
     const client = this.client;
-
-    client.on("error", function (err) {
-      logger("error", err);
-    });
-
-    client.on("connect", () => { });
 
     logger(
       "connecting as guest to",
