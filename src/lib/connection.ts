@@ -77,9 +77,7 @@ export class Platform extends EventEmitter {
   createMqttInstance = (userName: string, password: string, applyListeners: (client: mqtt.MqttClient) => void) => {
     if (this.client) this.client.end(true);
 
-    logger(
-      `connecting as to prefix ${this.mqttHost}:${this.mqttPort}, username ${this.userName}, password=${this.deviceId} `
-    );
+    logger(`connecting as to prefix ${this.mqttHost}:${this.mqttPort}, username ${userName}, password=${password.replace(/./g, "*")}`);
 
     const config: mqtt.IClientOptions = {
       username: userName,
