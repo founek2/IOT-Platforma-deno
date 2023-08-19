@@ -1,6 +1,6 @@
 import mqtt, { MqttClient } from 'npm:mqtt@5';
 
-const SECONDS_10 = 10 * 1000;
+const SECONDS_5 = 5 * 1000;
 
 type ClientCb = (client: MqttClient) => void;
 
@@ -9,18 +9,25 @@ function connect(brokerUrl: string, config: mqtt.IClientOptions, cb: ClientCb, f
     return new Promise<void>((res) =>
         setTimeout(
             () => {
-                console.info(`Trying to connect to MQTT host=${brokerUrl} port=${config.port}`);
-                const client = mqtt.connect(brokerUrl, config);
+                console.info(`Connecting to MQTT host=${brokerUrl}:${config.port} username=${config.username}`);
+                const client = mqtt.connect(brokerUrl, { ...config, reconnectPeriod: 0 });
+
+                let disableFlag = false;
+                client.on("disable" as any, function () {
+                    disableFlag = true;
+                })
                 client.on('close', function () {
                     console.info('mqtt closed connection');
-                    connect(brokerUrl, config, cb);
+                    if (!disableFlag) {
+                        connect(brokerUrl, config, cb);
+                    } else console.log("connection disabled, skipping reconnect")
                 });
 
                 cb(client)
 
                 res();
             },
-            forceNow ? 0 : SECONDS_10
+            forceNow ? 0 : SECONDS_5
         )
     );
 }

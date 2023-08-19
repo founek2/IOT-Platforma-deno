@@ -74,12 +74,8 @@ export class Platform extends EventEmitter {
     localStorage.removeItem(this.deviceId);
   };
 
-  createMqttInstance = (userName: string, password: string, applyListeners: (client: mqtt.MqttClient) => void) => {
-    if (this.client) this.client.end(true);
-
-    logger(`connecting as to prefix ${this.mqttHost}:${this.mqttPort}, username ${userName}, password=${password.replace(/./g, "*")}`);
-
-    const config: mqtt.IClientOptions = {
+  mqttParams = (userName: string, password: string): mqtt.IClientOptions => {
+    return {
       username: userName,
       password: password,
       port: this.mqttPort,
@@ -92,24 +88,13 @@ export class Platform extends EventEmitter {
         qos: 1,
       },
     }
+  }
 
+  createMqttInstance = (userName: string, password: string, applyListeners: (client: mqtt.MqttClient) => void) => {
+    if (this.client) this.client.end(true);
+
+    const config = this.mqttParams(userName, password);
     connect(this.mqttHost, config, applyListeners)
-
-    const client = mqtt.connect(this.mqttHost, {
-      username: userName,
-      password: password,
-      port: this.mqttPort,
-      rejectUnauthorized: false,
-      keepalive: 20,
-      will: {
-        topic: "v2/" + this.userName + "/" + this.deviceId + "/$state",
-        payload: Buffer.from(DeviceStatus.lost, "utf-8"),
-        retain: true,
-        qos: 1,
-      },
-    })
-
-    this.client = client;
   }
 
   connect = () => {
@@ -192,8 +177,11 @@ export class Platform extends EventEmitter {
   };
 
   publishStatus = (status: DeviceStatus, client: mqtt.MqttClient) => {
-    if (!client.disconnecting || !client.disconnected)
-      this.client.publish(`${this.getDevicePrefix()}/$state`, status)
+    if (!client.disconnecting || !client.disconnected) {
+      const topic = `${this.getDevicePrefix()}/$state`
+      this.client.publish(topic, status)
+      console.log("Publishing status", topic, status)
+    }
   };
 
   getDevicePrefix = () => `${this.prefix}/${this.deviceId}`;
@@ -227,8 +215,6 @@ export class Platform extends EventEmitter {
         node.updateClient(this.getDevicePrefix(), client)
       });
 
-      logger("meta", this.meta);
-
       client.on("message", (topic, message) => {
         logger("message", topic, message.toString());
 
@@ -239,7 +225,10 @@ export class Platform extends EventEmitter {
 
           this.publishStatus(DeviceStatus.paired, client);
           this.publishStatus(DeviceStatus.disconnected, client);
-          client.end();
+
+          // way to disable my forced reconnect
+          client.emit("disable" as any, true)
+          client.end()
           this.connect();
         }
       });
@@ -288,6 +277,7 @@ export class Platform extends EventEmitter {
 
   disconnect = () => {
     this.publishStatus(DeviceStatus.disconnected, this.client);
+    this.client.emit("disable" as any, true)
     this.client.end()
   };
 }
