@@ -226,8 +226,6 @@ export class Platform extends EventEmitter {
           this.publishStatus(DeviceStatus.paired, client);
           this.publishStatus(DeviceStatus.disconnected, client);
 
-          // way to disable my forced reconnect
-          client.emit("disable" as any, true)
           client.end()
           this.connect();
         }
@@ -237,19 +235,6 @@ export class Platform extends EventEmitter {
     }
 
     this.createMqttInstance(`guest=${this.deviceId}`, this.userName, applyListeners)
-
-    // this.client = mqtt.connect(this.mqttHost, {
-    //   username: "guest=" + this.deviceId,
-    //   password: this.userName,
-    //   port: this.mqttPort,
-    //   rejectUnauthorized: false,
-    //   will: {
-    //     topic: `${this.getDevicePrefix()}/$state`,
-    //     payload: new Buffer(new TextEncoder().encode(DeviceStatus.lost)),
-    //     retain: true,
-    //     qos: 1,
-    //   }
-    // });
   };
 
   publishPropertyData = (
@@ -277,7 +262,6 @@ export class Platform extends EventEmitter {
 
   disconnect = () => {
     this.publishStatus(DeviceStatus.disconnected, this.client);
-    this.client.emit("disable" as any, true)
     this.client.end()
   };
 }

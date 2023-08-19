@@ -10,17 +10,13 @@ function connect(brokerUrl: string, config: mqtt.IClientOptions, cb: ClientCb, f
         setTimeout(
             () => {
                 console.info(`Connecting to MQTT host=${brokerUrl}:${config.port} username=${config.username}`);
-                const client = mqtt.connect(brokerUrl, { ...config, reconnectPeriod: 0 });
+                const client = mqtt.connect(brokerUrl, config);
 
-                let disableFlag = false;
-                client.on("disable" as any, function () {
-                    disableFlag = true;
-                })
-                client.on('close', function () {
-                    console.info('mqtt closed connection');
-                    if (!disableFlag) {
-                        connect(brokerUrl, config, cb);
-                    } else console.log("connection disabled, skipping reconnect")
+                client.on('error', function (err) {
+                    console.error('mqtt connection error', err);
+                    // console.info('mqtt closed connection');
+                    connect(brokerUrl, config, cb);
+                    client.end()
                 });
 
                 cb(client)
@@ -47,9 +43,8 @@ function applyLogging(cl: MqttClient) {
         console.debug(topic);
     });
 
-    cl.on('error', function (err) {
-        console.error('mqtt connection error', err);
-        cl.end();
+    cl.on('close', function () {
+        console.info('mqtt closed connection');
     });
 
     cl.on('disconnect', function () {
