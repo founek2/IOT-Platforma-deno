@@ -5,7 +5,6 @@ const SECONDS_5 = 5 * 1000;
 type ClientCb = (client: MqttClient) => void;
 
 function connect(brokerUrl: string, config: mqtt.IClientOptions, cb: ClientCb, forceNow = false) {
-
     return new Promise<void>((res) =>
         setTimeout(
             () => {

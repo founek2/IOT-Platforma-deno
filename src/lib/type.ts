@@ -29,70 +29,70 @@ export enum PropertyDataType {
     color = 'color',
 }
 
-export interface IUser {
-    _id?: any;
-    info: {
-        userName: string;
-        firstName: string;
-        lastName: string;
-        email?: string;
-        phoneNumber?: string;
-    };
-    auth: {
-        type: 'passwd';
-        password: string;
-    };
-    realm: string;
-    groups: string[];
-    notifyTokens: string[];
-    createdAt: Date;
-    updatedAt: Date;
-}
+// export interface IUser {
+//     _id?: any;
+//     info: {
+//         userName: string;
+//         firstName: string;
+//         lastName: string;
+//         email?: string;
+//         phoneNumber?: string;
+//     };
+//     auth: {
+//         type: 'passwd';
+//         password: string;
+//     };
+//     realm: string;
+//     groups: string[];
+//     notifyTokens: string[];
+//     createdAt: Date;
+//     updatedAt: Date;
+// }
 
-export interface IDiscovery {
-    _id?: any;
-    deviceId: string;
-    realm: string;
-    name: string;
-    things: { [nodeId: string]: any };
-    createdAt: Date;
-    updatedAt: Date;
-    state: {
-        status: {
-            value: string;
-            timestamp: Date;
-        };
-    };
-    pairing: boolean;
-}
+// export interface IDiscovery {
+//     _id?: any;
+//     deviceId: string;
+//     realm: string;
+//     name: string;
+//     things: { [nodeId: string]: any };
+//     createdAt: Date;
+//     updatedAt: Date;
+//     state: {
+//         status: {
+//             value: string;
+//             timestamp: Date;
+//         };
+//     };
+//     pairing: boolean;
+// }
 
-export interface IDevice {
-    _id?: any;
-    info: {
-        name: string;
-        description?: string;
-        imgPath?: string;
-        location: {
-            building: string;
-            room: string;
-        };
-    };
-    permissions: {
-        read: string[];
-        write: string[];
-        control: string[];
-    };
-    things: any[];
-    state?: {
-        status: string;
-        lastAck?: Date;
-    };
-    apiKey: string;
-    metadata: {
-        realm: string;
-        deviceId: string;
-        publicRead?: boolean;
-    };
-    createdAt: Date;
-    updatedAt: Date;
-}
+// export interface IDevice {
+//     _id: string;
+//     info: {
+//         name: string;
+//         description?: string;
+//         imgPath?: string;
+//         location: {
+//             building: string;
+//             room: string;
+//         };
+//     };
+//     permissions: {
+//         read: string[];
+//         write: string[];
+//         control: string[];
+//     };
+//     things: any[];
+//     state?: {
+//         status: string;
+//         lastAck?: Date;
+//     };
+//     apiKey: string;
+//     metadata: {
+//         realm: string;
+//         deviceId: string;
+//         publicRead?: boolean;
+//     };
+//     createdAt: Date;
+//     updatedAt: Date;
+// }
