@@ -43,6 +43,7 @@ function applyLogging(cl: MqttClient) {
     });
 
     cl.on('close', function () {
+        cl.reconnect()
         console.info('mqtt closed connection');
     });
 
