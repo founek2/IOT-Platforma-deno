@@ -93,9 +93,12 @@ export async function assignProperty(
         name: translatedName,
         settable: Boolean(expose.access & settableMask),
         format: expose.values?.join(","),
-        callback: (prop) => {
-          console.log("recieved enum:", prop.value);
-          publishBridge(prop.value!);
+        callback: (newValue) => {
+          console.log("recieved enum:", newValue);
+          publishBridge(newValue!);
+
+          // returns false, setting value will be handled once device confirms change
+          return Promise.resolve(false);
         },
       });
       break;
@@ -108,9 +111,11 @@ export async function assignProperty(
         name: translatedName,
         settable: Boolean(expose.access & settableMask),
         unitOfMeasurement: expose.unit,
-        callback: (prop) => {
-          console.log("recieved float:", prop.value);
-          publishBridge(prop.value!);
+        callback: (newValue) => {
+          console.log("recieved float:", newValue);
+          publishBridge(newValue!);
+
+          return Promise.resolve(false);
         },
       });
       break;
@@ -120,10 +125,12 @@ export async function assignProperty(
         dataType: PropertyDataType.boolean,
         name: translatedName,
         settable: Boolean(expose.access & settableMask),
-        callback: (prop) => {
-          console.log("recieved binary:", prop.value);
-          if (prop.value === "true") publishBridge(expose.value_on);
+        callback: (newValue) => {
+          console.log("recieved binary:", newValue);
+          if (newValue === "true") publishBridge(expose.value_on);
           else publishBridge(expose.value_off);
+
+          return Promise.resolve(false);
         },
       });
       break;
@@ -133,9 +140,11 @@ export async function assignProperty(
         dataType: PropertyDataType.string,
         name: translatedName,
         settable: Boolean(expose.access & settableMask),
-        callback: (prop) => {
-          console.log("recieved text:", prop.value);
-          publishBridge(prop.value!);
+        callback: (newValue) => {
+          console.log("recieved text:", newValue);
+          publishBridge(newValue!);
+
+          return Promise.resolve(false);
         },
       });
       break;

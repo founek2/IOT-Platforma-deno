@@ -1,6 +1,7 @@
 import { MqttClient } from "npm:mqtt@5";
 import { PropertyClass, PropertyDataType } from "./type.ts";
 
+export type CallbackFn = (value: string) => Promise<boolean>;
 export interface PropertyArgs {
     propertyId: string;
     name: string;
@@ -10,7 +11,7 @@ export interface PropertyArgs {
     format?: string;
     settable?: boolean;
     retained?: boolean;
-    callback?: (prop: Property) => void;
+    callback?: CallbackFn;
 }
 export class Property {
     propertyId: string;
@@ -22,7 +23,7 @@ export class Property {
     settable?: boolean;
     retained?: boolean;
     value: string | undefined;
-    callback?: (prop: Property) => void;
+    callback?: CallbackFn;
     propertyTopic?: string
     client?: MqttClient
 
@@ -82,14 +83,13 @@ export class Property {
         const propertySetTopic = `${propertyPrefix}/set`;
 
         client.subscribe(propertySetTopic)
-        client.on("message", (topic, payload) => {
+        client.on("message", async (topic, payload) => {
             if (topic !== propertySetTopic) return
             const newValue = payload.toString();
 
             console.log("Recieved:", topic, newValue)
-            this.value = newValue
-            if (this.callback) this.callback(this);
-            client.publish(propertyPrefix, newValue)
+            const result = this.callback ? await this.callback(newValue) : true;
+            if (result) this.setValue(newValue)
         })
         client.on("reconnect", () => console.log("reconnected"))
     }
@@ -99,7 +99,7 @@ export class Property {
             if (!this.client.disconnected && !this.client.disconnecting)
                 this.client.publish(this.propertyTopic, newValue)
             else console.log("Ignoring setValue, client not connected")
-        }
+        } else console.log("Mssing either propertyTopic or client")
         this.value = newValue;
     }
 
