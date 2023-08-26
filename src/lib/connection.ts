@@ -107,7 +107,7 @@ export class Platform extends EventEmitter {
 
     const applyListeners = (client: mqtt.MqttClient) => {
       this.client = client;
-      this.publishStatus(DeviceStatus.init, client);
+      this.publishStatus(DeviceStatus.init);
 
       logger("connecting as paired device");
       // client.subscribe("v2/device/" + this.deviceId + "/apiKey");
@@ -155,7 +155,7 @@ export class Platform extends EventEmitter {
         this.emit("connect", client);
       });
 
-      this.publishStatus(DeviceStatus.ready, client);
+      this.publishStatus(DeviceStatus.ready);
     }
 
     this.createMqttInstance(`device=${this.userName}/${this.deviceId}`, this.meta.apiKey, applyListeners)
@@ -176,8 +176,8 @@ export class Platform extends EventEmitter {
     node.addProperty(args);
   };
 
-  publishStatus = (status: DeviceStatus, client: mqtt.MqttClient) => {
-    if (!client.disconnecting || !client.disconnected) {
+  publishStatus = (status: DeviceStatus) => {
+    if (!this.client.disconnecting || !this.client.disconnected) {
       const topic = `${this.getDevicePrefix()}/$state`
       this.client.publish(topic, status)
       console.log("Publishing status", topic, status)
@@ -202,7 +202,7 @@ export class Platform extends EventEmitter {
     this.prefix = "prefix";
     const applyListeners = (client: mqtt.MqttClient) => {
       this.client = client;
-      this.publishStatus(DeviceStatus.init, client);
+      this.publishStatus(DeviceStatus.init);
 
       const devicePrefix = this.getDevicePrefix();
       client.subscribe(`${devicePrefix}/$config/apiKey/set`);
@@ -223,15 +223,15 @@ export class Platform extends EventEmitter {
           localStorage.setItem(this.deviceId, JSON.stringify(this.meta));
           logger("GOT apiKey -> reconect");
 
-          this.publishStatus(DeviceStatus.paired, client);
-          this.publishStatus(DeviceStatus.disconnected, client);
+          this.publishStatus(DeviceStatus.paired);
+          this.publishStatus(DeviceStatus.disconnected);
 
           client.end()
           this.connect();
         }
       });
 
-      this.publishStatus(DeviceStatus.ready, client);
+      this.publishStatus(DeviceStatus.ready);
     }
 
     this.createMqttInstance(`guest=${this.deviceId}`, this.userName, applyListeners)
@@ -261,7 +261,7 @@ export class Platform extends EventEmitter {
   };
 
   disconnect = () => {
-    this.publishStatus(DeviceStatus.disconnected, this.client);
+    this.publishStatus(DeviceStatus.disconnected);
     this.client.end()
   };
 }

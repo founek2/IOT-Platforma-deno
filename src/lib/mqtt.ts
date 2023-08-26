@@ -15,7 +15,7 @@ function connect(brokerUrl: string, config: mqtt.IClientOptions, cb: ClientCb, f
                     console.error('mqtt connection error', err);
                     // console.info('mqtt closed connection');
                     connect(brokerUrl, config, cb);
-                    client.end()
+                    client.end(true)
                 });
 
                 cb(client)
