@@ -28,7 +28,7 @@ zigbeeClient.on("disconnect", function () {
 });
 
 zigbeeClient.on("message", function (topic, message) {
-    if (!topic.includes("logging")) console.log("message", topic);
+    if (!topic.includes("logging") && !topic.startsWith("zigbee2mqtt/bridge/")) console.log("message", topic, message.toString());
 
     const handle = topicParser(topic, message);
 

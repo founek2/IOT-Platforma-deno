@@ -1,30 +1,30 @@
 import mqtt, { MqttClient } from 'npm:mqtt@5';
 
-const SECONDS_5 = 5 * 1000;
-
 type ClientCb = (client: MqttClient) => void;
 
 function connect(brokerUrl: string, config: mqtt.IClientOptions, cb: ClientCb, forceNow = false) {
-    return new Promise<void>((res) =>
-        setTimeout(
-            () => {
-                console.info(`Connecting to MQTT host=${brokerUrl}:${config.port} username=${config.username}`);
-                const client = mqtt.connect(brokerUrl, config);
+    console.info(`Connecting to MQTT host=${brokerUrl}:${config.port} username=${config.username}`);
+    const client = mqtt.connect(brokerUrl, config);
 
-                client.on('error', function (err) {
-                    console.error('mqtt connection error', err);
-                    // console.info('mqtt closed connection');
-                    connect(brokerUrl, config, cb);
-                    client.end(true)
-                });
+    client.on('error', function () {
+        console.error('mqtt connection error');
+        // console.info('mqtt closed connection');
 
-                cb(client)
+        // setTimeout(() => {
+        //     client.reconnect()
+        // }, SECONDS_5)
+    });
 
-                res();
-            },
-            forceNow ? 0 : SECONDS_5
-        )
-    );
+    client.on('close', function () {
+        // cl.reconnect()
+        console.info('mqtt closed connection');
+    });
+
+    client.on('disconnect', function () {
+        console.info('mqtt disconnected');
+    });
+
+    cb(client)
 }
 
 function applyLogging(cl: MqttClient) {
@@ -42,14 +42,6 @@ function applyLogging(cl: MqttClient) {
         console.debug(topic);
     });
 
-    cl.on('close', function () {
-        cl.reconnect()
-        console.info('mqtt closed connection');
-    });
-
-    cl.on('disconnect', function () {
-        console.info('mqtt disconnected');
-    });
     cl.on('offline', function () {
         console.info('mqtt offline');
     });
