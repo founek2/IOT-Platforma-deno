@@ -2,7 +2,7 @@
   "name": "zigbee-plugin",
   "type": "module",
   "scripts": {
-    "dev": "deno run --watch --allow-read --allow-env --allow-net --allow-write=. --check ./src/index.ts",
+    "dev": "deno run --watch --allow-read --allow-env --allow-net --allow-write=. --check  --unsafely-ignore-certificate-errors ./src/index.ts",
     "start": "node dist/index.js"
   }
 }
