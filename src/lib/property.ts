@@ -1,7 +1,7 @@
 import { MqttClient } from "npm:mqtt@5";
 import { PropertyClass, PropertyDataType } from "./type.ts";
 
-export type CallbackFn = (value: string) => Promise<boolean>;
+export type CallbackFn = (value: string) => (Promise<boolean> | Promise<void> | void);
 export interface PropertyArgs {
     propertyId: string;
     name: string;
@@ -89,7 +89,7 @@ export class Property {
 
             console.log("Recieved:", topic, newValue)
             const result = this.callback ? await this.callback(newValue) : true;
-            if (result) this.setValue(newValue)
+            if (result || result === undefined) this.setValue(newValue)
         })
         client.on("reconnect", () => console.log("reconnected"))
     }
