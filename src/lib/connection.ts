@@ -6,6 +6,7 @@ import { localStorage } from "./storage.ts";
 import { Property, PropertyArgs } from "./property.ts";
 import { Buffer } from "node:buffer";
 import connect from "./mqtt.ts"
+import { logger } from "./logger/index.ts";
 
 export enum DeviceStatus {
   disconnected = "disconnected",
@@ -19,9 +20,6 @@ export enum DeviceStatus {
   paired = "paired",
 }
 
-function logger(...args: any) {
-  if (Deno.env.get("MODE") != "test") console.log(...args);
-}
 interface store {
   apiKey: string;
 }
@@ -99,7 +97,7 @@ export class Platform extends EventEmitter {
 
   connect = () => {
     if (this.meta === null) {
-      logger("cant connect without apiKey");
+      logger.error("cant connect without apiKey");
       return;
     }
 
@@ -109,7 +107,7 @@ export class Platform extends EventEmitter {
       this.client = client;
       this.publishStatus(DeviceStatus.init);
 
-      logger("connecting as paired device");
+      logger.debug("connecting as paired device");
       // client.subscribe("v2/device/" + this.deviceId + "/apiKey");
       client.subscribe(`${this.getDevicePrefix()}/$cmd/set`);
 
@@ -122,14 +120,14 @@ export class Platform extends EventEmitter {
 
       client.on("message", (topic, data) => {
         const message = data.toString();
-        logger("message", topic, message);
+        logger.debug("message", topic, message);
         if (topic === `${this.getDevicePrefix()}/$cmd/set`) {
           if (message === DeviceCommand.restart) {
-            logger("Reseting...");
+            logger.warning("Reseting...");
             client.end();
             this.connect();
           } else if (message === DeviceCommand.reset) {
-            logger("Restarting...");
+            logger.info("Restarting...");
             client.end();
             this.forgot();
             this.connectPairing();
@@ -141,14 +139,14 @@ export class Platform extends EventEmitter {
       client.on("error", (err: any) => {
         if (err.code === 4) {
           // Invalid login
-          logger("Invalid userName/password, forgeting apiKey");
+          logger.error("Invalid userName/password, forgeting apiKey");
 
           if (Deno.env.get("NODE_ENV") !== "production") {
             client.end();
             this.forgot();
             this.connectPairing();
           }
-        } else logger("error2", err);
+        } else logger.error("error2", err);
       });
 
       client.on("connect", () => {
@@ -180,7 +178,7 @@ export class Platform extends EventEmitter {
     if (!this.client.disconnecting || !this.client.disconnected) {
       const topic = `${this.getDevicePrefix()}/$state`
       this.client.publish(topic, status)
-      console.log("Publishing status", topic, status)
+      logger.debug("Publishing status", topic, status)
     }
   };
 
@@ -216,12 +214,10 @@ export class Platform extends EventEmitter {
       });
 
       client.on("message", (topic, message) => {
-        logger("message", topic, message.toString());
-
-        if (this.getDevicePrefix() + "/$config/apiKey/set") {
+        if (topic === this.getDevicePrefix() + "/$config/apiKey/set") {
           this.meta = { apiKey: message.toString() };
           localStorage.setItem(this.deviceId, JSON.stringify(this.meta));
-          logger("GOT apiKey -> reconect");
+          logger.info("GOT apiKey -> reconect");
 
           this.publishStatus(DeviceStatus.paired);
           this.publishStatus(DeviceStatus.disconnected);
@@ -248,10 +244,8 @@ export class Platform extends EventEmitter {
       prop.propertyId === propertyId
     );
     if (!node || !property) {
-      return logger(`unable to locate node with property ${propertyId}`);
+      return logger.error(`unable to locate node with property ${propertyId}`);
     }
-
-    if (!this.client) return logger("Not connected");
 
     const finalValue = typeof value === "function"
       ? value(node, property)

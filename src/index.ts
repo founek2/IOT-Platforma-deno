@@ -5,6 +5,7 @@ import { DeviceStatus, Platform } from "./lib/connection.ts";
 import { ComponentType, PropertyDataType } from "./lib/type.ts";
 import { calculateHash } from "./hash.ts";
 import { topicParser } from "./topicParser.ts";
+import { logger } from "./lib/logger/index.ts";
 
 const instances: Platform[] = [];
 let globalData: { devices: Device[], fingerprint: string } = { devices: [], fingerprint: "" };
@@ -14,21 +15,21 @@ const zigbeeClient = mqtt.connect(config.ZIGBEE_BRIDGE_HOST, {
 });
 
 zigbeeClient.on("connect", function () {
-    console.log("zigbeeClient connected");
+    logger.info("zigbeeClient connected");
     zigbeeClient.subscribe("zigbee2mqtt/#");
 });
-zigbeeClient.on("reconnect", () => console.log("zigbeeClient reconnected"))
+zigbeeClient.on("reconnect", () => logger.silly("zigbeeClient reconnected"))
 
 zigbeeClient.on("error", function (err) {
-    console.error("zigbeeClient error", err);
+    logger.error("zigbeeClient error", err);
 });
 
 zigbeeClient.on("disconnect", function () {
-    console.log("zigbeeClient disconnected");
+    logger.debug("zigbeeClient disconnected");
 });
 
 zigbeeClient.on("message", function (topic, message) {
-    if (!topic.includes("logging") && !topic.startsWith("zigbee2mqtt/bridge/")) console.log("message", topic, message.toString());
+    if (!topic.includes("logging") && !topic.startsWith("zigbee2mqtt/bridge/")) logger.debug("message", topic, message.toString());
 
     const handle = topicParser(topic, message);
 
@@ -36,7 +37,7 @@ zigbeeClient.on("message", function (topic, message) {
         const devicesStr = message.toString();
         const hash = await calculateHash(devicesStr)
         if (globalData.fingerprint === hash) {
-            console.log("Fingerprint matches, skipping refresh")
+            logger.debug("Fingerprint matches, skipping refresh")
             return
         }
 
@@ -45,7 +46,7 @@ zigbeeClient.on("message", function (topic, message) {
             fingerprint: hash,
         };
 
-        console.log("Refreshing devices");
+        logger.debug("Refreshing devices");
         await shutdownDevices();
         spawnDevices(globalData.devices);
     });
@@ -158,7 +159,7 @@ Deno.addSignalListener("SIGTERM", shutdownClients);
 Deno.addSignalListener("SIGQUIT", shutdownClients);
 
 async function shutdownDevices() {
-    console.log("Shuting down clients");
+    logger.warning("Shuting down clients");
     const promises = instances.map((plat) => plat.disconnect());
     await Promise.all(promises);
 }

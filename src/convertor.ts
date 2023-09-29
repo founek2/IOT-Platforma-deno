@@ -2,6 +2,7 @@ import { Node } from "./lib/node.ts";
 import { PropertyDataType } from "./lib/type.ts";
 import { config } from "./config.ts";
 import translateDeepl from "npm:translate";
+import { logger } from "./lib/logger/index.ts";
 
 function translate(text: string) {
   if (!config.DEEPL_API_KEY) return text;
@@ -94,7 +95,7 @@ export async function assignProperty(
         settable: Boolean(expose.access & settableMask),
         format: expose.values?.join(","),
         callback: (newValue) => {
-          console.log("recieved enum:", newValue);
+          logger.debug("recieved enum:", newValue);
           publishBridge(newValue!);
 
           // returns false, setting value will be handled once device confirms change
@@ -112,7 +113,7 @@ export async function assignProperty(
         settable: Boolean(expose.access & settableMask),
         unitOfMeasurement: expose.unit,
         callback: (newValue) => {
-          console.log("recieved float:", newValue);
+          logger.debug("recieved float:", newValue);
           publishBridge(newValue!);
 
           return Promise.resolve(false);
@@ -126,7 +127,7 @@ export async function assignProperty(
         name: translatedName,
         settable: Boolean(expose.access & settableMask),
         callback: (newValue) => {
-          console.log("recieved binary:", newValue);
+          logger.debug("recieved binary:", newValue);
           if (newValue === "true") publishBridge(expose.value_on);
           else publishBridge(expose.value_off);
 
@@ -141,7 +142,7 @@ export async function assignProperty(
         name: translatedName,
         settable: Boolean(expose.access & settableMask),
         callback: (newValue) => {
-          console.log("recieved text:", newValue);
+          logger.debug("recieved text:", newValue);
           publishBridge(newValue!);
 
           return Promise.resolve(false);
