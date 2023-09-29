@@ -8,7 +8,7 @@ function connect(brokerUrl: string, config: mqtt.IClientOptions, cb: ClientCb, f
     const client = mqtt.connect(brokerUrl, config);
 
     client.on('error', function () {
-        console.error('mqtt connection error');
+        logger.error('mqtt connection error');
         // console.info('mqtt closed connection');
 
         // setTimeout(() => {
@@ -18,11 +18,11 @@ function connect(brokerUrl: string, config: mqtt.IClientOptions, cb: ClientCb, f
 
     client.on('close', function () {
         // cl.reconnect()
-        console.info('mqtt closed connection');
+        logger.debug('mqtt closed connection');
     });
 
     client.on('disconnect', function () {
-        console.info('mqtt disconnected');
+        logger.warning('mqtt disconnected');
     });
 
     cb(client)
