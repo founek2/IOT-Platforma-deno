@@ -1,7 +1,7 @@
 import { MqttClient } from "npm:mqtt@5";
 import { PropertyClass, PropertyDataType } from "./type.ts";
 import { logger } from "./logger/index.ts";
-
+import { Buffer } from 'node:buffer';
 
 export type CallbackFn = (value: string) => (Promise<boolean> | Promise<void> | void);
 export interface PropertyArgs {
@@ -24,7 +24,7 @@ export class Property {
     format?: string;
     settable?: boolean;
     retained?: boolean;
-    value: string | undefined;
+    value: string | Buffer | undefined;
     callback?: CallbackFn;
     propertyTopic?: string
     client?: MqttClient
@@ -96,7 +96,7 @@ export class Property {
         client.on("reconnect", () => logger.silly("reconnected"))
     }
 
-    setValue = (newValue: string) => {
+    setValue = (newValue: string | Buffer) => {
         if (this.propertyTopic && this.client) {
             if (!this.client.disconnected && !this.client.disconnecting)
                 this.client.publish(this.propertyTopic, newValue)
