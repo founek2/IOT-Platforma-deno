@@ -254,8 +254,8 @@ export class Platform extends EventEmitter {
     property.setValue(finalValue)
   };
 
-  disconnect = () => {
+  disconnect = async () => {
     this.publishStatus(DeviceStatus.disconnected);
-    this.client.end()
+    await this.client.endAsync()
   };
 }
