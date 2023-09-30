@@ -85,6 +85,7 @@ export class Platform extends EventEmitter {
         retain: true,
         qos: 1,
       },
+      clientId: `mqttjs_${this.deviceId}`
     }
   }
 
