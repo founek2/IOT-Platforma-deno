@@ -27,6 +27,7 @@ export enum PropertyDataType {
     integer = 'integer',
     enum = 'enum',
     color = 'color',
+    binary = 'binary',
 }
 
 // export interface IUser {
