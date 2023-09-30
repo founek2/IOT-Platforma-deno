@@ -19,3 +19,5 @@ export const logger = {
     debug: consoleLog('blue', 'DEBUG  ', LogLevel.DEBUG),
     silly: consoleLog('yellow', 'SILLY  ', LogLevel.SILLY),
 };
+
+export type Logger = typeof logger
