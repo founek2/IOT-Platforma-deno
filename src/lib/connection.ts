@@ -78,7 +78,7 @@ export class Platform extends EventEmitter {
       password: password,
       port: this.mqttPort,
       rejectUnauthorized: false,
-      keepalive: 10,
+      keepalive: 30,
       will: {
         topic: `${this.getDevicePrefix()}/$state`,
         payload: Buffer.from(DeviceStatus.lost, "utf-8"),

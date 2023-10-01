@@ -96,17 +96,24 @@ export class Property {
         client.on("reconnect", () => logger.silly("reconnected"))
     }
 
-    setValue = (newValue: string | Buffer) => {
+    private publish = (newValue: string | Buffer) => {
         if (this.propertyTopic && this.client) {
             if (!this.client.disconnected && !this.client.disconnecting)
                 this.client.publish(this.propertyTopic, newValue)
             else logger.warning("Ignoring setValue, client not connected")
         } else logger.warning("Mssing either propertyTopic or client")
+    }
+
+    setValue = (newValue: string | Buffer) => {
+        this.publish(newValue)
         this.value = newValue;
     }
 
     updateClient = (nodePrefix: string, client: MqttClient) => {
         this.client = client;
         this.propertyTopic = `${nodePrefix}/${this.propertyId}`;
+
+        // send value when changing connection prefix
+        if (this.value) this.publish(this.value)
     }
 }
