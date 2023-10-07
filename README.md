@@ -1,9 +1,11 @@
-# zigbeePlugin
+# IoT Platform client
 
-This plugin acts as a bridge between IoT Platform and Zigbee2Mqtt. It connects to Mosquito MQTT running on Zigbee2Mqtt and creates client per device, which connects to IoT Platform. Bi-directional communication is supported.
+This library provides client for communication with [IoT Platform](https://prod.iotplatforma.cloud) written for Deno. You can specify all nodes and properties (including callback) and library will automatically handle announcing and pairing with platform. Refer to [examples](./examples/) to see how to use it.
 
-Tested devices:
+## Note
 
-- SONOFF BASICZBR3
-- GiEX QT06_2
-- TuYa TS0601_soil
+Api keys used to authenticate clients will be stored in local-storage folder.
+
+## License
+
+This code is released under the MIT License.
