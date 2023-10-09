@@ -45,8 +45,8 @@ export class Platform extends EventEmitter {
     mqttPort: number,
   ) {
     super();
-    this.deviceId = Deno.env.get("DEVICE_ID") || deviceId;
-    this.userName = Deno.env.get("USERNAME") || userName;
+    this.deviceId = deviceId;
+    this.userName = userName;
     this.deviceName = deviceName;
     this.mqttHost = mqttHost;
     this.mqttPort = mqttPort;
