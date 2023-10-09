@@ -93,7 +93,8 @@ export class Platform extends EventEmitter {
     if (this.client) this.client.end(true);
 
     const config = this.mqttParams(userName, password);
-    connect(this.mqttHost, config, applyListeners)
+    this.client = connect(this.mqttHost, config)
+    applyListeners(this.client)
   }
 
   connect = () => {
@@ -105,7 +106,6 @@ export class Platform extends EventEmitter {
     this.prefix = `v2/${this.userName}`;
 
     const applyListeners = (client: mqtt.MqttClient) => {
-      this.client = client;
       this.publishStatus(DeviceStatus.init);
 
       logger.debug("connecting as paired device");
@@ -138,16 +138,14 @@ export class Platform extends EventEmitter {
       });
 
       client.on("error", (err: any) => {
-        if (err.code === 4) {
+        if (err.code === 4 && Deno.env.get("NODE_ENV") !== "production") {
           // Invalid login
           logger.error("Invalid userName/password, forgeting apiKey");
 
-          if (Deno.env.get("NODE_ENV") !== "production") {
-            client.end();
-            this.forgot();
-            this.connectPairing();
-          }
-        } else logger.error("error2", err);
+          client.end();
+          this.forgot();
+          this.connectPairing();
+        }
       });
 
       client.on("connect", () => {
@@ -200,7 +198,6 @@ export class Platform extends EventEmitter {
   connectPairing = () => {
     this.prefix = "prefix";
     const applyListeners = (client: mqtt.MqttClient) => {
-      this.client = client;
       this.publishStatus(DeviceStatus.init);
 
       const devicePrefix = this.getDevicePrefix();

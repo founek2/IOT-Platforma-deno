@@ -3,31 +3,25 @@ import { logger } from './logger/index.ts';
 
 type ClientCb = (client: MqttClient) => void;
 
-function connect(brokerUrl: string, config: mqtt.IClientOptions, cb: ClientCb, forceNow = false) {
+export default function connect(brokerUrl: string, config: mqtt.IClientOptions) {
     logger.debug(`Connecting to MQTT host=${brokerUrl}:${config.port} username=${config.username}`);
     const client = mqtt.connect(brokerUrl, config);
 
-    cb(client)
+    applyLogging(client)
+
+    return client;
 }
 
 function applyLogging(cl: MqttClient) {
     cl.on('message', function (topic) {
-        logger.silly(topic);
+        logger.debug(topic);
     });
 
     cl.on('offline', function () {
         logger.silly('mqtt offline');
     });
+
+    cl.on('error', function (err) {
+        logger.silly('mqtt error', err.name);
+    });
 }
-
-/* Initialize MQTT client connection */
-export default async (brokerUrl: string, config: mqtt.IClientOptions, apply: (client: MqttClient) => void) => {
-    function applyListeners(cl: MqttClient) {
-        applyLogging(cl)
-        apply(cl)
-    }
-
-    await connect(brokerUrl, config, (cl) => {
-        applyListeners(cl)
-    }, true);
-};
