@@ -3,7 +3,7 @@ import { PropertyClass, PropertyDataType } from "./type.ts";
 import { logger } from "./logger/index.ts";
 import { Buffer } from 'node:buffer';
 
-export type CallbackFn = (value: string) => (Promise<boolean> | Promise<void> | void);
+export type CallbackFn = (value: string) => (Promise<boolean> | Promise<void> | boolean | void);
 export interface PropertyArgs {
     propertyId: string;
     name: string;
