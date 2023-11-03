@@ -148,13 +148,15 @@ export class Platform extends EventEmitter {
         }
       });
 
+      client.on("reconnect", () => this.publishStatus(DeviceStatus.ready))
+      client.on("disconnect", () => this.publishStatus(DeviceStatus.lost))
       client.on("connect", () => {
-        this.publishStatus(DeviceStatus.ready)
         this.emit("connect", client);
       });
     }
 
     this.createMqttInstance(`device=${this.userName}/${this.deviceId}`, this.meta.apiKey, applyListeners)
+
   };
 
   addNode = (nodeId: string, name: string, componentType: ComponentType) => {
@@ -176,6 +178,7 @@ export class Platform extends EventEmitter {
     if (!this.client.disconnecting || !this.client.disconnected) {
       const topic = `${this.getDevicePrefix()}/$state`
       this.client.publish(topic, status)
+      this.status = status;
       logger.debug("Publishing status", topic, status)
     }
   };
@@ -224,7 +227,8 @@ export class Platform extends EventEmitter {
         }
       });
 
-      client.on("connect", () => this.publishStatus(DeviceStatus.ready))
+      client.on("reconnect", () => this.publishStatus(DeviceStatus.ready))
+      client.on("disconnect", () => this.publishStatus(DeviceStatus.lost))
     }
 
     this.createMqttInstance(`guest=${this.deviceId}`, this.userName, applyListeners)
