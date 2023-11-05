@@ -125,10 +125,12 @@ export class Platform extends EventEmitter {
         if (topic === `${this.getDevicePrefix()}/$cmd/set`) {
           if (message === DeviceCommand.restart) {
             logger.warning("Restarting...");
+            this.publishStatus(DeviceStatus.disconnected)
             client.end();
             this.connect();
           } else if (message === DeviceCommand.reset) {
             logger.info("Reseting...");
+            this.publishStatus(DeviceStatus.disconnected)
             client.end();
             this.forgot();
             this.connectPairing();
