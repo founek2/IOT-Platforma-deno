@@ -155,6 +155,8 @@ export class Platform extends EventEmitter {
       client.on("connect", () => {
         this.emit("connect", client);
       });
+
+      this.publishStatus(DeviceStatus.ready)
     }
 
     this.createMqttInstance(`device=${this.userName}/${this.deviceId}`, this.meta.apiKey, applyListeners)
@@ -231,6 +233,8 @@ export class Platform extends EventEmitter {
 
       client.on("reconnect", () => this.publishStatus(DeviceStatus.ready))
       client.on("disconnect", () => this.publishStatus(DeviceStatus.lost))
+
+      this.publishStatus(DeviceStatus.ready)
     }
 
     this.createMqttInstance(`guest=${this.deviceId}`, this.userName, applyListeners)
