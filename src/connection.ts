@@ -124,11 +124,11 @@ export class Platform extends EventEmitter {
         logger.debug("message", topic, message);
         if (topic === `${this.getDevicePrefix()}/$cmd/set`) {
           if (message === DeviceCommand.restart) {
-            logger.warning("Reseting...");
+            logger.warning("Restarting...");
             client.end();
             this.connect();
           } else if (message === DeviceCommand.reset) {
-            logger.info("Restarting...");
+            logger.info("Reseting...");
             client.end();
             this.forgot();
             this.connectPairing();
