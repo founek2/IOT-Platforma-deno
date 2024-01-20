@@ -1,7 +1,7 @@
 import { ComponentType, DeviceCommand } from "./type.ts";
 import * as mqtt from "npm:mqtt@5";
 import { Node } from "./node.ts";
-import { EventEmitter } from "node:events";
+import { EventEmitter } from "https://deno.land/x/eventemitter@1.2.4/mod.ts";
 import { localStorage } from "./storage.ts";
 import { Property, PropertyArgs } from "./property.ts";
 import { Buffer } from "node:buffer";
@@ -24,7 +24,10 @@ interface store {
   apiKey: string;
 }
 
-export class Platform extends EventEmitter {
+export class Platform extends EventEmitter<{
+  connect(client: mqtt.MqttClient): any,
+  message(topic: string, payload: Buffer): any,
+}> {
   deviceId: string;
   deviceName: string;
   meta: null | store = null;
@@ -217,7 +220,7 @@ export class Platform extends EventEmitter {
         node.updateClient(this.getDevicePrefix(), client)
       });
 
-      client.on("message", (topic, message) => {
+      client.on("message", (topic: string, message: Buffer) => {
         if (topic === this.getDevicePrefix() + "/$config/apiKey/set") {
           this.meta = { apiKey: message.toString() };
           localStorage.setItem(this.deviceId, JSON.stringify(this.meta));
@@ -228,6 +231,8 @@ export class Platform extends EventEmitter {
 
           client.end()
           this.connect();
+        } else {
+          this.emit("message", topic, message)
         }
       });
 
@@ -265,4 +270,8 @@ export class Platform extends EventEmitter {
     this.publishStatus(DeviceStatus.disconnected);
     await this.client.endAsync()
   };
+
+  subscribeTopic = (topic: string) => {
+    return this.client.subscribe(topic)
+  }
 }
