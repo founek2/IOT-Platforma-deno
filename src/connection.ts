@@ -122,8 +122,8 @@ export class Platform extends EventEmitter<{
         node.updateClient(this.getDevicePrefix(), client)
       });
 
-      client.on("message", (topic, data) => {
-        const message = data.toString();
+      client.on("message", (topic, payload) => {
+        const message = payload.toString();
         logger.debug("message", topic, message);
         if (topic === `${this.getDevicePrefix()}/$cmd/set`) {
           if (message === DeviceCommand.restart) {
@@ -138,6 +138,8 @@ export class Platform extends EventEmitter<{
             this.forgot();
             this.connectPairing();
           }
+        } else {
+          this.emit("message", topic, payload)
         }
 
       });
@@ -231,8 +233,6 @@ export class Platform extends EventEmitter<{
 
           client.end()
           this.connect();
-        } else {
-          this.emit("message", topic, message)
         }
       });
 
