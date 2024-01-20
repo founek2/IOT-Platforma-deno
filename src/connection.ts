@@ -271,7 +271,14 @@ export class Platform extends EventEmitter<{
     await this.client.endAsync()
   };
 
+
+  /**
+   * Will register topic once paired with platform
+   * @param topic string
+   * @returns 
+   */
   subscribeTopic = (topic: string) => {
-    return this.client.subscribe(topic)
+    if (this.prefix.startsWith("v2/"))
+      return this.client.subscribe(topic)
   }
 }
