@@ -109,6 +109,10 @@ export class Property {
         this.value = newValue;
     }
 
+    getValue = () => {
+        return this.value;
+    }
+
     updateClient = (nodePrefix: string, client: MqttClient) => {
         this.client = client;
         this.propertyTopic = `${nodePrefix}/${this.propertyId}`;
