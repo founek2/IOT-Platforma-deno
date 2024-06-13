@@ -7,6 +7,7 @@ import { Buffer } from "buffer";
 import connect from "./mqtt.ts"
 import { logger } from "./logger/index.ts";
 import { EventEmitter } from "./eventEmitter.ts";
+import { getEnv } from "./logger/getEnv.ts";
 
 export enum DeviceStatus {
   disconnected = "disconnected",
@@ -36,6 +37,7 @@ export class Platform extends EventEmitter {
   status: DeviceStatus = DeviceStatus.lost;
   mqttHost: string;
   mqttPort: number;
+  localStorage: ILocalStorage;
 
   constructor(
     deviceId: string,
@@ -53,8 +55,9 @@ export class Platform extends EventEmitter {
     this.mqttPort = mqttPort;
     // temporary fix
     this.client = undefined as any;
+    this.localStorage = localStorage;
 
-    const storedItem = localStorage.getItem(this.deviceId);
+    const storedItem = this.localStorage.getItem(this.deviceId);
     if (storedItem) this.meta = JSON.parse(storedItem);
   }
 
@@ -70,7 +73,7 @@ export class Platform extends EventEmitter {
   forgot = () => {
     this.meta = null;
     this.prefix = "prefix";
-    localStorage.removeItem(this.deviceId);
+    this.localStorage.removeItem(this.deviceId);
   };
 
   mqttParams = (userName: string, password: string): mqtt.IClientOptions => {
@@ -143,7 +146,7 @@ export class Platform extends EventEmitter {
       });
 
       client.on("error", (err: any) => {
-        if (err.code === 4 && Deno.env.get("NODE_ENV") !== "production") {
+        if (err.code === 4 && getEnv("NODE_ENV") !== "production") {
           // Invalid login
           logger.error("Invalid userName/password, forgeting apiKey");
 
@@ -223,7 +226,7 @@ export class Platform extends EventEmitter {
       client.on("message", (topic: string, message: Buffer) => {
         if (topic === this.getDevicePrefix() + "/$config/apiKey/set") {
           this.meta = { apiKey: message.toString() };
-          localStorage.setItem(this.deviceId, JSON.stringify(this.meta));
+          this.localStorage.setItem(this.deviceId, JSON.stringify(this.meta));
           logger.info("GOT apiKey -> reconect");
 
           this.publishStatus(DeviceStatus.paired);

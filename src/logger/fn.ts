@@ -1,3 +1,5 @@
+import { getEnv } from "./getEnv.ts";
+
 const styleArray = {
     red: ['color: red', '\x1b[31m'],
     green: ['color: green', '\x1b[32m'],
@@ -22,7 +24,7 @@ export function loggerFn(useCss = true, styles = styleArray) {
                 }
 
                 // log message
-                const currentLogLevel = Number(Deno.env.get("LOG_LEVEL") || '2');
+                const currentLogLevel = Number(getEnv("LOG_LEVEL") || '2');
                 if (currentLogLevel >= logLevel) {
                     if (useCss)
                         log.apply(logger, [
