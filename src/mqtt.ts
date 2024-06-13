@@ -1,4 +1,4 @@
-import mqtt, { MqttClient } from 'npm:mqtt@5';
+import mqtt, { MqttClient } from 'mqtt';
 import { logger } from './logger/index.ts';
 
 type ClientCb = (client: MqttClient) => void;

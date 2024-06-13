@@ -1,6 +1,5 @@
-// @deno-types="npm:@types/node-localstorage"
-import { LocalStorage } from "npm:node-localstorage";
-
-export const localStorage = new LocalStorage(
-  Deno.env.get("STORAGE_PATH") || "local-storage"
-);
+export interface ILocalStorage {
+  getItem(key: string): string | null;
+  removeItem(key: string): void;
+  setItem(key: string, value: string): void;
+}

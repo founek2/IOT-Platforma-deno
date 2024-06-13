@@ -1,12 +1,12 @@
 import { ComponentType, DeviceCommand } from "./type.ts";
-import * as mqtt from "npm:mqtt@5";
+import * as mqtt from "mqtt";
 import { Node } from "./node.ts";
-import { EventEmitter } from "https://deno.land/x/eventemitter@1.2.4/mod.ts";
-import { localStorage } from "./storage.ts";
+import type { ILocalStorage } from "./storage.ts";
 import { Property, PropertyArgs } from "./property.ts";
-import { Buffer } from "node:buffer";
+import { Buffer } from "buffer";
 import connect from "./mqtt.ts"
 import { logger } from "./logger/index.ts";
+import { EventEmitter } from "./eventEmitter.ts";
 
 export enum DeviceStatus {
   disconnected = "disconnected",
@@ -24,10 +24,7 @@ interface store {
   apiKey: string;
 }
 
-export class Platform extends EventEmitter<{
-  connect(client: mqtt.MqttClient): any,
-  message(topic: string, payload: Buffer): any,
-}> {
+export class Platform extends EventEmitter {
   deviceId: string;
   deviceName: string;
   meta: null | store = null;
@@ -46,6 +43,7 @@ export class Platform extends EventEmitter<{
     deviceName: string,
     mqttHost: string,
     mqttPort: number,
+    localStorage: ILocalStorage
   ) {
     super();
     this.deviceId = deviceId;
