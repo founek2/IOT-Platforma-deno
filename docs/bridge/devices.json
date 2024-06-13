@@ -53,40 +53,62 @@
     "interview_completed": true,
     "interviewing": false,
     "network_address": 0,
-    "supported": false,
+    "supported": true,
     "type": "Coordinator"
   },
   {
-    "date_code": "20201026",
     "definition": {
-      "description": "Zigbee smart switch",
+      "description": "MiJia wireless switch",
       "exposes": [
         {
-          "features": [
-            {
-              "access": 7,
-              "description": "On/off state of the switch",
-              "name": "state",
-              "property": "state",
-              "type": "binary",
-              "value_off": "OFF",
-              "value_on": "ON",
-              "value_toggle": "TOGGLE"
-            }
-          ],
-          "type": "switch"
+          "access": 1,
+          "description": "Remaining battery in %, can take up to 24 hours before reported.",
+          "label": "Battery",
+          "name": "battery",
+          "property": "battery",
+          "type": "numeric",
+          "unit": "%",
+          "value_max": 100,
+          "value_min": 0
         },
         {
-          "access": 7,
-          "description": "Controls the behavior when the device is powered on after power loss",
-          "name": "power_on_behavior",
-          "property": "power_on_behavior",
+          "access": 1,
+          "description": "Triggered action (e.g. a button click)",
+          "label": "Action",
+          "name": "action",
+          "property": "action",
           "type": "enum",
-          "values": ["off", "on", "toggle", "previous"]
+          "values": [
+            "single",
+            "double",
+            "triple",
+            "quadruple",
+            "hold",
+            "release",
+            "many"
+          ]
+        },
+        {
+          "access": 1,
+          "description": "Voltage of the battery in millivolts",
+          "label": "Voltage",
+          "name": "voltage",
+          "property": "voltage",
+          "type": "numeric",
+          "unit": "mV"
+        },
+        {
+          "access": 1,
+          "description": "Number of power outages",
+          "label": "Power outage count",
+          "name": "power_outage_count",
+          "property": "power_outage_count",
+          "type": "numeric"
         },
         {
           "access": 1,
           "description": "Link quality (signal strength)",
+          "label": "Linkquality",
           "name": "linkquality",
           "property": "linkquality",
           "type": "numeric",
@@ -95,16 +117,254 @@
           "value_min": 0
         }
       ],
-      "model": "BASICZBR3",
+      "model": "WXKG01LM",
       "options": [
         {
           "access": 2,
-          "description": "State actions will also be published as 'action' when true (default false).",
-          "name": "state_action",
-          "property": "state_action",
+          "description": "The WXKG01LM only reports a button press and release.By default, a hold action is published when there is at least 1000 ms between both events. It could be that due to delays in the network the release message is received late. This causes a single click to be identified as a hold action. If you are experiencing this you can try experimenting with this option (e.g. set it to 2000) (value is in ms).",
+          "label": "Hold timeout",
+          "name": "hold_timeout",
+          "property": "hold_timeout",
+          "type": "numeric",
+          "value_min": 0
+        },
+        {
+          "access": 2,
+          "description": "Sometimes it happens that the button does not send a release. To avoid problems a release is automatically send after a timeout. The default timeout is 4000 ms, you can increase it with this option (value is in ms).",
+          "label": "Hold timeout expire",
+          "name": "hold_timeout_expire",
+          "property": "hold_timeout_expire",
+          "type": "numeric",
+          "value_min": 0
+        },
+        {
+          "access": 2,
+          "description": "Set to false to disable the legacy integration (highly recommended), will change structure of the published payload (default true).",
+          "label": "Legacy",
+          "name": "legacy",
+          "property": "legacy",
           "type": "binary",
           "value_off": false,
           "value_on": true
+        }
+      ],
+      "supports_ota": false,
+      "vendor": "Xiaomi"
+    },
+    "disabled": false,
+    "endpoints": {
+      "1": {
+        "bindings": [],
+        "clusters": { "input": [], "output": [] },
+        "configured_reportings": [],
+        "scenes": []
+      }
+    },
+    "friendly_name": "Switch White",
+    "ieee_address": "0x00158d0008307c5b",
+    "interview_completed": true,
+    "interviewing": false,
+    "manufacturer": "LUMI",
+    "model_id": "lumi.sensor_switch",
+    "network_address": 50869,
+    "power_source": "Battery",
+    "supported": true,
+    "type": "EndDevice"
+  },
+  {
+    "date_code": "20161128",
+    "definition": {
+      "description": "Aqara door & window contact sensor",
+      "exposes": [
+        {
+          "access": 1,
+          "description": "Remaining battery in %, can take up to 24 hours before reported.",
+          "label": "Battery",
+          "name": "battery",
+          "property": "battery",
+          "type": "numeric",
+          "unit": "%",
+          "value_max": 100,
+          "value_min": 0
+        },
+        {
+          "access": 1,
+          "description": "Indicates if the contact is closed (= true) or open (= false)",
+          "label": "Contact",
+          "name": "contact",
+          "property": "contact",
+          "type": "binary",
+          "value_off": true,
+          "value_on": false
+        },
+        {
+          "access": 1,
+          "description": "Temperature of the device",
+          "label": "Device temperature",
+          "name": "device_temperature",
+          "property": "device_temperature",
+          "type": "numeric",
+          "unit": "°C"
+        },
+        {
+          "access": 1,
+          "description": "Voltage of the battery in millivolts",
+          "label": "Voltage",
+          "name": "voltage",
+          "property": "voltage",
+          "type": "numeric",
+          "unit": "mV"
+        },
+        {
+          "access": 1,
+          "description": "Number of power outages",
+          "label": "Power outage count",
+          "name": "power_outage_count",
+          "property": "power_outage_count",
+          "type": "numeric"
+        },
+        {
+          "access": 1,
+          "description": "Link quality (signal strength)",
+          "label": "Linkquality",
+          "name": "linkquality",
+          "property": "linkquality",
+          "type": "numeric",
+          "unit": "lqi",
+          "value_max": 255,
+          "value_min": 0
+        }
+      ],
+      "model": "MCCGQ11LM",
+      "options": [
+        {
+          "access": 2,
+          "description": "Calibrates the device_temperature value (absolute offset), takes into effect on next report of device.",
+          "label": "Device temperature calibration",
+          "name": "device_temperature_calibration",
+          "property": "device_temperature_calibration",
+          "type": "numeric"
+        }
+      ],
+      "supports_ota": false,
+      "vendor": "Xiaomi"
+    },
+    "disabled": false,
+    "endpoints": {
+      "1": {
+        "bindings": [],
+        "clusters": {
+          "input": ["genBasic", "genIdentify", "65535", "genOnOff"],
+          "output": ["genBasic", "genGroups", "65535"]
+        },
+        "configured_reportings": [],
+        "scenes": []
+      }
+    },
+    "friendly_name": "Aqara senzor",
+    "ieee_address": "0x00158d00090e73b2",
+    "interview_completed": true,
+    "interviewing": false,
+    "manufacturer": "LUMI",
+    "model_id": "lumi.sensor_magnet.aq2",
+    "network_address": 10096,
+    "power_source": "Battery",
+    "software_build_id": "3000-0001",
+    "supported": true,
+    "type": "EndDevice"
+  },
+  {
+    "date_code": "20211103",
+    "definition": {
+      "description": "Temperature and humidity sensor",
+      "exposes": [
+        {
+          "access": 1,
+          "description": "Remaining battery in %, can take up to 24 hours before reported.",
+          "label": "Battery",
+          "name": "battery",
+          "property": "battery",
+          "type": "numeric",
+          "unit": "%",
+          "value_max": 100,
+          "value_min": 0
+        },
+        {
+          "access": 1,
+          "description": "Measured temperature value",
+          "label": "Temperature",
+          "name": "temperature",
+          "property": "temperature",
+          "type": "numeric",
+          "unit": "°C"
+        },
+        {
+          "access": 1,
+          "description": "Measured relative humidity",
+          "label": "Humidity",
+          "name": "humidity",
+          "property": "humidity",
+          "type": "numeric",
+          "unit": "%"
+        },
+        {
+          "access": 1,
+          "description": "Voltage of the battery in millivolts",
+          "label": "Voltage",
+          "name": "voltage",
+          "property": "voltage",
+          "type": "numeric",
+          "unit": "mV"
+        },
+        {
+          "access": 1,
+          "description": "Link quality (signal strength)",
+          "label": "Linkquality",
+          "name": "linkquality",
+          "property": "linkquality",
+          "type": "numeric",
+          "unit": "lqi",
+          "value_max": 255,
+          "value_min": 0
+        }
+      ],
+      "model": "SNZB-02",
+      "options": [
+        {
+          "access": 2,
+          "description": "Calibrates the temperature value (absolute offset), takes into effect on next report of device.",
+          "label": "Temperature calibration",
+          "name": "temperature_calibration",
+          "property": "temperature_calibration",
+          "type": "numeric"
+        },
+        {
+          "access": 2,
+          "description": "Number of digits after decimal point for temperature, takes into effect on next report of device. This option can only decrease the precision, not increase it.",
+          "label": "Temperature precision",
+          "name": "temperature_precision",
+          "property": "temperature_precision",
+          "type": "numeric",
+          "value_max": 3,
+          "value_min": 0
+        },
+        {
+          "access": 2,
+          "description": "Calibrates the humidity value (absolute offset), takes into effect on next report of device.",
+          "label": "Humidity calibration",
+          "name": "humidity_calibration",
+          "property": "humidity_calibration",
+          "type": "numeric"
+        },
+        {
+          "access": 2,
+          "description": "Number of digits after decimal point for humidity, takes into effect on next report of device. This option can only decrease the precision, not increase it.",
+          "label": "Humidity precision",
+          "name": "humidity_precision",
+          "property": "humidity_precision",
+          "type": "numeric",
+          "value_max": 3,
+          "value_min": 0
         }
       ],
       "supports_ota": false,
@@ -113,31 +373,292 @@
     "disabled": false,
     "endpoints": {
       "1": {
-        "bindings": [],
+        "bindings": [
+          {
+            "cluster": "msTemperatureMeasurement",
+            "target": {
+              "endpoint": 1,
+              "ieee_address": "0xe0798dfffe7f47b2",
+              "type": "endpoint"
+            }
+          },
+          {
+            "cluster": "msRelativeHumidity",
+            "target": {
+              "endpoint": 1,
+              "ieee_address": "0xe0798dfffe7f47b2",
+              "type": "endpoint"
+            }
+          },
+          {
+            "cluster": "genPowerCfg",
+            "target": {
+              "endpoint": 1,
+              "ieee_address": "0xe0798dfffe7f47b2",
+              "type": "endpoint"
+            }
+          }
+        ],
         "clusters": {
           "input": [
             "genBasic",
             "genIdentify",
+            "msTemperatureMeasurement",
+            "msRelativeHumidity",
+            "genPowerCfg"
+          ],
+          "output": ["genIdentify"]
+        },
+        "configured_reportings": [
+          {
+            "attribute": "measuredValue",
+            "cluster": "msTemperatureMeasurement",
+            "maximum_report_interval": 1800,
+            "minimum_report_interval": 5,
+            "reportable_change": 20
+          },
+          {
+            "attribute": "measuredValue",
+            "cluster": "msRelativeHumidity",
+            "maximum_report_interval": 3600,
+            "minimum_report_interval": 10,
+            "reportable_change": 100
+          },
+          {
+            "attribute": "batteryVoltage",
+            "cluster": "genPowerCfg",
+            "maximum_report_interval": 7200,
+            "minimum_report_interval": 3600,
+            "reportable_change": 0
+          },
+          {
+            "attribute": "batteryPercentageRemaining",
+            "cluster": "genPowerCfg",
+            "maximum_report_interval": 7200,
+            "minimum_report_interval": 3600,
+            "reportable_change": 0
+          }
+        ],
+        "scenes": []
+      }
+    },
+    "friendly_name": "Teploměr",
+    "ieee_address": "0x00124b002a6cf462",
+    "interview_completed": true,
+    "interviewing": false,
+    "manufacturer": "eWeLink",
+    "model_id": "TH01",
+    "network_address": 27241,
+    "power_source": "Battery",
+    "supported": true,
+    "type": "EndDevice"
+  },
+  {
+    "date_code": "20211103",
+    "definition": {
+      "description": "Contact sensor",
+      "exposes": [
+        {
+          "access": 1,
+          "description": "Indicates if the contact is closed (= true) or open (= false)",
+          "label": "Contact",
+          "name": "contact",
+          "property": "contact",
+          "type": "binary",
+          "value_off": true,
+          "value_on": false
+        },
+        {
+          "access": 1,
+          "description": "Indicates if the battery of this device is almost empty",
+          "label": "Battery low",
+          "name": "battery_low",
+          "property": "battery_low",
+          "type": "binary",
+          "value_off": false,
+          "value_on": true
+        },
+        {
+          "access": 1,
+          "description": "Remaining battery in %, can take up to 24 hours before reported.",
+          "label": "Battery",
+          "name": "battery",
+          "property": "battery",
+          "type": "numeric",
+          "unit": "%",
+          "value_max": 100,
+          "value_min": 0
+        },
+        {
+          "access": 1,
+          "description": "Voltage of the battery in millivolts",
+          "label": "Voltage",
+          "name": "voltage",
+          "property": "voltage",
+          "type": "numeric",
+          "unit": "mV"
+        },
+        {
+          "access": 1,
+          "description": "Link quality (signal strength)",
+          "label": "Linkquality",
+          "name": "linkquality",
+          "property": "linkquality",
+          "type": "numeric",
+          "unit": "lqi",
+          "value_max": 255,
+          "value_min": 0
+        }
+      ],
+      "model": "SNZB-04",
+      "options": [],
+      "supports_ota": false,
+      "vendor": "SONOFF"
+    },
+    "disabled": false,
+    "endpoints": {
+      "1": {
+        "bindings": [
+          {
+            "cluster": "genPowerCfg",
+            "target": {
+              "endpoint": 1,
+              "ieee_address": "0xe0798dfffe7f47b2",
+              "type": "endpoint"
+            }
+          }
+        ],
+        "clusters": {
+          "input": ["genBasic", "genIdentify", "ssIasZone", "genPowerCfg"],
+          "output": ["genIdentify"]
+        },
+        "configured_reportings": [
+          {
+            "attribute": "batteryVoltage",
+            "cluster": "genPowerCfg",
+            "maximum_report_interval": 7200,
+            "minimum_report_interval": 3600,
+            "reportable_change": 0
+          },
+          {
+            "attribute": "batteryPercentageRemaining",
+            "cluster": "genPowerCfg",
+            "maximum_report_interval": 7200,
+            "minimum_report_interval": 3600,
+            "reportable_change": 0
+          }
+        ],
+        "scenes": []
+      }
+    },
+    "friendly_name": "Sonoff senzor",
+    "ieee_address": "0x00124b0029346042",
+    "interview_completed": true,
+    "interviewing": false,
+    "manufacturer": "eWeLink",
+    "model_id": "DS01",
+    "network_address": 41747,
+    "power_source": "Battery",
+    "supported": true,
+    "type": "EndDevice"
+  },
+  {
+    "date_code": "",
+    "definition": {
+      "description": "Smoke sensor",
+      "exposes": [
+        {
+          "access": 1,
+          "description": "Indicates whether the device detected smoke",
+          "label": "Smoke",
+          "name": "smoke",
+          "property": "smoke",
+          "type": "binary",
+          "value_off": false,
+          "value_on": true
+        },
+        {
+          "access": 1,
+          "description": "Indicates if the battery of this device is almost empty",
+          "label": "Battery low",
+          "name": "battery_low",
+          "property": "battery_low",
+          "type": "binary",
+          "value_off": false,
+          "value_on": true
+        },
+        {
+          "access": 1,
+          "description": "Indicates whether the device is tampered",
+          "label": "Tamper",
+          "name": "tamper",
+          "property": "tamper",
+          "type": "binary",
+          "value_off": false,
+          "value_on": true
+        },
+        {
+          "access": 1,
+          "description": "Remaining battery in %, can take up to 24 hours before reported.",
+          "label": "Battery",
+          "name": "battery",
+          "property": "battery",
+          "type": "numeric",
+          "unit": "%",
+          "value_max": 100,
+          "value_min": 0
+        },
+        {
+          "access": 1,
+          "description": "Link quality (signal strength)",
+          "label": "Linkquality",
+          "name": "linkquality",
+          "property": "linkquality",
+          "type": "numeric",
+          "unit": "lqi",
+          "value_max": 255,
+          "value_min": 0
+        }
+      ],
+      "model": "TS0205",
+      "options": [],
+      "supports_ota": false,
+      "vendor": "TuYa"
+    },
+    "disabled": false,
+    "endpoints": {
+      "1": {
+        "bindings": [],
+        "clusters": {
+          "input": [
+            "genBasic",
             "genGroups",
             "genScenes",
-            "genOnOff"
+            "genPowerCfg",
+            "ssIasZone"
           ],
-          "output": ["genBasic"]
+          "output": [
+            "genIdentify",
+            "genGroups",
+            "genOnOff",
+            "touchlink",
+            "genTime",
+            "genOta"
+          ]
         },
         "configured_reportings": [],
         "scenes": []
       }
     },
-    "friendly_name": "switch-1",
-    "ieee_address": "0x00124b00226c9a95",
+    "friendly_name": "Detektor kouře",
+    "ieee_address": "0xa4c138d891066ada",
     "interview_completed": true,
     "interviewing": false,
-    "manufacturer": "SONOFF",
-    "model_id": "BASICZBR3",
-    "network_address": 37720,
-    "power_source": "Mains (single phase)",
-    "software_build_id": "1.0.3",
+    "manufacturer": "_TZ3210_up3pngle",
+    "model_id": "TS0205",
+    "network_address": 61933,
+    "power_source": "Battery",
     "supported": true,
-    "type": "Router"
+    "type": "EndDevice"
   }
 ]
