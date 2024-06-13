@@ -1,9 +1,9 @@
 import { ComponentType, DeviceCommand } from "./type.ts";
-import * as mqtt from "mqtt";
+import * as mqtt from "npm:mqtt@5";
 import { Node } from "./node.ts";
 import type { ILocalStorage } from "./storage.ts";
 import { Property, PropertyArgs } from "./property.ts";
-import { Buffer } from "buffer";
+import { Buffer } from "node:buffer";
 import connect from "./mqtt.ts"
 import { logger } from "./logger/index.ts";
 import { EventEmitter } from "./eventEmitter.ts";

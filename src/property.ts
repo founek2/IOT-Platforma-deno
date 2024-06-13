@@ -1,7 +1,7 @@
-import { MqttClient } from "mqtt";
+import { MqttClient } from "npm:mqtt@5";
 import { PropertyClass, PropertyDataType } from "./type.ts";
 import { logger } from "./logger/index.ts";
-import { Buffer } from "buffer";
+import { Buffer } from "node:buffer";
 
 export type CallbackFn = (value: string) => (Promise<boolean | void> | boolean | void);
 export interface PropertyArgs {
